@@ -26,31 +26,46 @@ class TestValidateWidgetScoringGraph:
     def test_malformed_score_no_widget(self, malformed_scoring_graph_no_widget, logger):
         """Test that Score with no widget raises MalformedScoreError."""
         with pytest.raises(MalformedScoreError) as exc_info:
-            validate_widget_scoring_graph(malformed_scoring_graph_no_widget, logger=logger)
+            validate_widget_scoring_graph(
+                malformed_scoring_graph_no_widget, logger=logger
+            )
 
         assert "widget" in str(exc_info.value).lower()
 
-    def test_malformed_score_multiple_widgets(self, malformed_scoring_graph_multiple_widgets, logger):
+    def test_malformed_score_multiple_widgets(
+        self, malformed_scoring_graph_multiple_widgets, logger
+    ):
         """Test that Score with multiple widgets raises MalformedScoreError."""
         with pytest.raises(MalformedScoreError) as exc_info:
-            validate_widget_scoring_graph(malformed_scoring_graph_multiple_widgets, logger=logger)
+            validate_widget_scoring_graph(
+                malformed_scoring_graph_multiple_widgets, logger=logger
+            )
 
         assert "widget" in str(exc_info.value).lower()
 
     def test_malformed_score_no_score(self, malformed_scoring_graph_no_score, logger):
         """Test that Score with no score raises MalformedScoreError."""
         with pytest.raises(MalformedScoreError) as exc_info:
-            validate_widget_scoring_graph(malformed_scoring_graph_no_score, logger=logger)
+            validate_widget_scoring_graph(
+                malformed_scoring_graph_no_score, logger=logger
+            )
 
         assert "score" in str(exc_info.value).lower()
 
-    def test_malformed_score_invalid_score_datatype(self, malformed_scoring_graph_invalid_score_type, logger):
+    def test_malformed_score_invalid_score_datatype(
+        self, malformed_scoring_graph_invalid_score_type, logger
+    ):
         """Test that Score with invalid score datatype raises MalformedScoreError."""
         with pytest.raises(MalformedScoreError) as exc_info:
-            validate_widget_scoring_graph(malformed_scoring_graph_invalid_score_type, logger=logger)
+            validate_widget_scoring_graph(
+                malformed_scoring_graph_invalid_score_type, logger=logger
+            )
 
         # The validation should fail due to datatype mismatch
-        assert "score" in str(exc_info.value).lower() or "decimal" in str(exc_info.value).lower()
+        assert (
+            "score" in str(exc_info.value).lower()
+            or "decimal" in str(exc_info.value).lower()
+        )
 
 
 class TestValidateScoreInstance:
@@ -67,11 +82,11 @@ class TestValidateScoreInstance:
 
         result = validate_score_instance(score_uri, g)
 
-        assert result['uri'] == score_uri
-        assert result['widget'] == URIRef("http://example.org/Widget")
-        assert result['score'] == Decimal("10")
-        assert result['dataGraphShapes'] == []
-        assert result['shapesGraphShapes'] == []
+        assert result["uri"] == score_uri
+        assert result["widget"] == URIRef("http://example.org/Widget")
+        assert result["score"] == Decimal("10")
+        assert result["dataGraphShapes"] == []
+        assert result["shapesGraphShapes"] == []
 
     def test_validate_score_with_shapes(self):
         """Test validating a Score instance with data and shapes graph shapes."""
@@ -88,8 +103,8 @@ class TestValidateScoreInstance:
 
         result = validate_score_instance(score_uri, g)
 
-        assert dg_shape in result['dataGraphShapes']
-        assert sg_shape in result['shapesGraphShapes']
+        assert dg_shape in result["dataGraphShapes"]
+        assert sg_shape in result["shapesGraphShapes"]
 
     def test_validate_score_missing_widget(self):
         """Test that missing widget raises MalformedScoreError."""
@@ -145,7 +160,10 @@ class TestValidateScoreInstance:
         with pytest.raises(MalformedScoreError) as exc_info:
             validate_score_instance(score_uri, g)
 
-        assert "decimal" in str(exc_info.value).lower() or "integer" in str(exc_info.value).lower()
+        assert (
+            "decimal" in str(exc_info.value).lower()
+            or "integer" in str(exc_info.value).lower()
+        )
 
     def test_validate_score_integer_value(self):
         """Test that integer scores are accepted."""
@@ -158,7 +176,7 @@ class TestValidateScoreInstance:
 
         result = validate_score_instance(score_uri, g)
 
-        assert result['score'] == Decimal("10")
+        assert result["score"] == Decimal("10")
 
     def test_validate_score_negative_value(self):
         """Test that negative scores are accepted."""
@@ -171,7 +189,7 @@ class TestValidateScoreInstance:
 
         result = validate_score_instance(score_uri, g)
 
-        assert result['score'] == Decimal("-5")
+        assert result["score"] == Decimal("-5")
 
 
 class TestExtractScoreInstances:

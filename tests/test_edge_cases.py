@@ -2,7 +2,7 @@
 
 from decimal import Decimal
 
-from rdflib import Graph, URIRef, Literal, Namespace
+from rdflib import Graph, Literal, Namespace
 from rdflib.namespace import RDF
 
 from shui_widget_scoring import score_widgets
@@ -26,7 +26,7 @@ class TestEmptyScoreConditions:
         result = score_widgets(
             value_node=Literal("any value"),
             widget_scoring_graph=scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         # Score should be applicable for any value
@@ -70,7 +70,7 @@ class TestNegativeScores:
         result = score_widgets(
             value_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         assert len(result.widget_scores) == 1
@@ -98,7 +98,7 @@ class TestNegativeScores:
         result = score_widgets(
             value_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         assert len(result.widget_scores) == 3
@@ -121,7 +121,7 @@ class TestNegativeScores:
         result = score_widgets(
             value_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         assert result.default_widget == EX.Widget2
@@ -142,7 +142,7 @@ class TestZeroScores:
         result = score_widgets(
             value_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         assert len(result.widget_scores) == 1
@@ -159,7 +159,7 @@ class TestZeroScores:
         result = score_widgets(
             value_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         # Zero scores are included by default (>= 0)
@@ -196,7 +196,7 @@ class TestMultipleScoresPerWidget:
         result = score_widgets(
             value_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         # Should have only one result for BooleanSelectEditor with max score
@@ -228,9 +228,7 @@ class TestMultipleScoresPerWidget:
 
         # Test with boolean value - both scores should match, max wins
         result = score_widgets(
-            value_node=Literal(True),
-            widget_scoring_graph=scoring_graph,
-            logger=logger
+            value_node=Literal(True), widget_scoring_graph=scoring_graph, logger=logger
         )
 
         assert len(result.widget_scores) == 1
@@ -248,17 +246,20 @@ class TestMissingConstraintShape:
         scoring_graph.add((EX.ShapeCheckScore, RDF.type, SHUI.Score))
         scoring_graph.add((EX.ShapeCheckScore, SHUI.widget, EX.SpecialWidget))
         scoring_graph.add((EX.ShapeCheckScore, SHUI.score, Literal(Decimal("10"))))
-        scoring_graph.add((EX.ShapeCheckScore, SHUI.shapesGraphShape, EX.SomeShapeCheck))
+        scoring_graph.add(
+            (EX.ShapeCheckScore, SHUI.shapesGraphShape, EX.SomeShapeCheck)
+        )
 
         # Add minimal shape to scoring graph
         from shui_widget_scoring.namespaces import SH
+
         scoring_graph.add((EX.SomeShapeCheck, RDF.type, SH.NodeShape))
 
         # Call without constraint_shape
         result = score_widgets(
             value_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         # Score should not be applicable
@@ -280,7 +281,7 @@ class TestLiteralVsNodeValueNodes:
         result = score_widgets(
             value_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         assert len(result.widget_scores) == 1
@@ -302,7 +303,7 @@ class TestLiteralVsNodeValueNodes:
             score_widgets(
                 value_node=EX.someNode,
                 widget_scoring_graph=scoring_graph,
-                logger=logger
+                logger=logger,
             )
 
     def test_uriref_value_node_with_data_graph(self, logger):
@@ -321,7 +322,7 @@ class TestLiteralVsNodeValueNodes:
             value_node=EX.item1,
             widget_scoring_graph=scoring_graph,
             data_graph=data_graph,
-            logger=logger
+            logger=logger,
         )
 
         assert len(result.widget_scores) == 1
@@ -348,7 +349,7 @@ class TestDecimalPrecision:
         result = score_widgets(
             value_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         # Widget2 should be first due to higher precise score

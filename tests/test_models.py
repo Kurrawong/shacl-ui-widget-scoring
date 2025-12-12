@@ -42,9 +42,15 @@ class TestWidgetScore:
 
     def test_widget_score_sorting_by_iri_when_equal_scores(self):
         """Test that WidgetScore sorts by widget IRI lexicographically when scores are equal."""
-        ws1 = WidgetScore(widget=URIRef("http://example.org/ZEditor"), score=Decimal("10"))
-        ws2 = WidgetScore(widget=URIRef("http://example.org/AEditor"), score=Decimal("10"))
-        ws3 = WidgetScore(widget=URIRef("http://example.org/MEditor"), score=Decimal("10"))
+        ws1 = WidgetScore(
+            widget=URIRef("http://example.org/ZEditor"), score=Decimal("10")
+        )
+        ws2 = WidgetScore(
+            widget=URIRef("http://example.org/AEditor"), score=Decimal("10")
+        )
+        ws3 = WidgetScore(
+            widget=URIRef("http://example.org/MEditor"), score=Decimal("10")
+        )
 
         sorted_scores = sorted([ws1, ws2, ws3])
 

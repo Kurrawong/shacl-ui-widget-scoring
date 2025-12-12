@@ -3,6 +3,7 @@
 
 class ShuiWidgetScoringError(Exception):
     """Base exception for SHUI widget scoring errors."""
+
     pass
 
 
@@ -16,9 +17,11 @@ class MalformedScoreError(ShuiWidgetScoringError):
 
 class InvalidValueNodeError(ShuiWidgetScoringError):
     """Raised when the value node is invalid or missing from data graph."""
+
     pass
 
 
 class MissingGraphError(ShuiWidgetScoringError):
     """Raised when required graphs are not provided."""
+
     pass

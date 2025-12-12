@@ -2,7 +2,7 @@
 
 from decimal import Decimal
 
-from rdflib import Graph, Literal, Namespace, URIRef
+from rdflib import Graph, Literal, Namespace
 from rdflib.namespace import RDF, XSD
 
 from shui_widget_scoring import score_widgets, SHUI, SH
@@ -58,97 +58,91 @@ def create_example_shapes_and_scores():
 
 def demo_boolean_value():
     """Demo scoring for a boolean value."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Demo 1: Scoring widgets for a boolean value")
-    print("="*60)
+    print("=" * 60)
 
     scoring_graph = create_example_shapes_and_scores()
     value_node = Literal(True)
 
-    result = score_widgets(
-        value_node=value_node,
-        widget_scoring_graph=scoring_graph
-    )
+    result = score_widgets(value_node=value_node, widget_scoring_graph=scoring_graph)
 
     print(f"\nValue: {value_node}")
     print(f"Type: {value_node.datatype}")
-    print(f"\nWidget Recommendations (sorted by score):")
+    print("\nWidget Recommendations (sorted by score):")
     for ws in result.widget_scores:
         widget_name = str(ws.widget).split("/")[-1]
         print(f"  - {widget_name}: {ws.score}")
 
-    print(f"\nDefault (highest-scoring) widget: {str(result.default_widget).split('/')[-1]}")
+    print(
+        f"\nDefault (highest-scoring) widget: {str(result.default_widget).split('/')[-1]}"
+    )
 
 
 def demo_date_value():
     """Demo scoring for a date value."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Demo 2: Scoring widgets for a date value")
-    print("="*60)
+    print("=" * 60)
 
     scoring_graph = create_example_shapes_and_scores()
     value_node = Literal("2025-01-15", datatype=XSD.date)
 
-    result = score_widgets(
-        value_node=value_node,
-        widget_scoring_graph=scoring_graph
-    )
+    result = score_widgets(value_node=value_node, widget_scoring_graph=scoring_graph)
 
     print(f"\nValue: {value_node}")
     print(f"Type: {value_node.datatype}")
-    print(f"\nWidget Recommendations (sorted by score):")
+    print("\nWidget Recommendations (sorted by score):")
     for ws in result.widget_scores:
         widget_name = str(ws.widget).split("/")[-1]
         print(f"  - {widget_name}: {ws.score}")
 
-    print(f"\nDefault (highest-scoring) widget: {str(result.default_widget).split('/')[-1]}")
+    print(
+        f"\nDefault (highest-scoring) widget: {str(result.default_widget).split('/')[-1]}"
+    )
 
 
 def demo_string_value():
     """Demo scoring for a string value."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Demo 3: Scoring widgets for a string value")
-    print("="*60)
+    print("=" * 60)
 
     scoring_graph = create_example_shapes_and_scores()
     value_node = Literal("Hello, World!")
 
-    result = score_widgets(
-        value_node=value_node,
-        widget_scoring_graph=scoring_graph
-    )
+    result = score_widgets(value_node=value_node, widget_scoring_graph=scoring_graph)
 
     print(f"\nValue: {value_node}")
     print(f"Type: {value_node.datatype or 'xsd:string (implicit)'}")
-    print(f"\nWidget Recommendations (sorted by score):")
+    print("\nWidget Recommendations (sorted by score):")
     for ws in result.widget_scores:
         widget_name = str(ws.widget).split("/")[-1]
         print(f"  - {widget_name}: {ws.score}")
 
-    print(f"\nDefault (highest-scoring) widget: {str(result.default_widget).split('/')[-1]}")
+    print(
+        f"\nDefault (highest-scoring) widget: {str(result.default_widget).split('/')[-1]}"
+    )
 
 
 def demo_filtering_by_score():
     """Demo filtering widgets by minimum score."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Demo 4: Filtering widgets by minimum score")
-    print("="*60)
+    print("=" * 60)
 
     scoring_graph = create_example_shapes_and_scores()
     value_node = Literal(True)
 
-    result = score_widgets(
-        value_node=value_node,
-        widget_scoring_graph=scoring_graph
-    )
+    result = score_widgets(value_node=value_node, widget_scoring_graph=scoring_graph)
 
     print(f"\nValue: {value_node}")
-    print(f"\nAll widgets (including low scores):")
+    print("\nAll widgets (including low scores):")
     for ws in result.widget_scores:
         widget_name = str(ws.widget).split("/")[-1]
         print(f"  - {widget_name}: {ws.score}")
 
-    print(f"\nWidgets with score >= 5:")
+    print("\nWidgets with score >= 5:")
     high_scoring = result.get_widgets_with_min_score(Decimal("5"))
     for ws in high_scoring:
         widget_name = str(ws.widget).split("/")[-1]
@@ -157,18 +151,18 @@ def demo_filtering_by_score():
 
 def main():
     """Run all demos."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("SHACL UI Widget Scoring - Demo")
-    print("="*60)
+    print("=" * 60)
 
     demo_boolean_value()
     demo_date_value()
     demo_string_value()
     demo_filtering_by_score()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Demo complete!")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
 
 if __name__ == "__main__":

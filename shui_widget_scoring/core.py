@@ -4,6 +4,7 @@ import logging
 from typing import Optional, Union
 
 from rdflib import Graph, URIRef, BNode, Literal
+from rdflib.namespace import RDF
 
 from .models import WidgetScore, ScoringResult
 from .namespaces import SH
@@ -21,7 +22,7 @@ def score_widgets(
     data_graph: Optional[Graph] = None,
     constraint_shape: Optional[Union[URIRef, BNode]] = None,
     shapes_graph: Optional[Graph] = None,
-    logger: Optional[logging.Logger] = None
+    logger: Optional[logging.Logger] = None,
 ) -> ScoringResult:
     """
     Score widgets based on SHACL UI Widget Scoring algorithm.
@@ -80,7 +81,9 @@ def score_widgets(
 
     # If constraint_shape provided, require shapes_graph
     if constraint_shape is not None and shapes_graph is None:
-        raise MissingGraphError("shapes_graph is required when constraint_shape is provided")
+        raise MissingGraphError(
+            "shapes_graph is required when constraint_shape is provided"
+        )
 
     # Step c: Extract Score Instances
     score_instances = extract_score_instances(widget_scoring_graph)
@@ -92,7 +95,7 @@ def score_widgets(
         valid = True
 
         # Validate against dataGraphShapes
-        for dg_shape in score_inst['dataGraphShapes']:
+        for dg_shape in score_inst["dataGraphShapes"]:
             # For Literal value nodes, use a simple datatype check or fallback to pyshacl
             if isinstance(value_node, Literal):
                 # Check if shape is defined in the scoring graph
@@ -101,13 +104,24 @@ def score_widgets(
                     # Shape is not defined, validation fails
                     valid = False
                     if logger:
-                        logger.warning(f"Data graph shape {dg_shape} is not defined in widget scoring graph")
+                        logger.warning(
+                            f"Data graph shape {dg_shape} is not defined in widget scoring graph"
+                        )
                     break
 
                 # For simple sh:datatype constraints, do direct comparison
-                from rdflib.namespace import XSD
+
                 shape_datatype = widget_scoring_graph.value(dg_shape, SH.datatype)
+
+                # Check if we can use the simple datatype limit optimization
+                # Pass if the only constraint is sh:datatype
+                is_simple_datatype_only = False
                 if shape_datatype:
+                    constraints = [p for p, o in shape_triples if p != RDF.type]
+                    if len(constraints) == 1 and constraints[0] == SH.datatype:
+                        is_simple_datatype_only = True
+
+                if is_simple_datatype_only:
                     # Simple datatype check
                     if value_node.datatype != shape_datatype:
                         valid = False
@@ -121,13 +135,16 @@ def score_widgets(
                     temp_property_shape = BNode()
 
                     # Add the literal as the object of a property
-                    from rdflib.namespace import RDF
                     temp_data_graph.add((temp_subject, temp_property, value_node))
 
                     # Create a property shape that copies constraints from node shape
-                    temp_shapes_graph.add((temp_property_shape, RDF.type, SH.PropertyShape))
+                    temp_shapes_graph.add(
+                        (temp_property_shape, RDF.type, SH.PropertyShape)
+                    )
                     temp_shapes_graph.add((temp_property_shape, SH.path, temp_property))
-                    temp_shapes_graph.add((temp_property_shape, SH.targetNode, temp_subject))
+                    temp_shapes_graph.add(
+                        (temp_property_shape, SH.targetNode, temp_subject)
+                    )
 
                     # Copy constraints from the node shape to the property shape
                     for p, o in shape_triples:
@@ -140,25 +157,21 @@ def score_widgets(
                         temp_property_shape,
                         temp_data_graph,
                         temp_shapes_graph,
-                        logger
+                        logger,
                     ):
                         valid = False
                         break
             else:
                 # For URIRef/BNode, validate directly
                 if not validate_node_against_shape(
-                    value_node,
-                    dg_shape,
-                    data_graph,
-                    widget_scoring_graph,
-                    logger
+                    value_node, dg_shape, data_graph, widget_scoring_graph, logger
                 ):
                     valid = False
                     break
 
         # Validate against shapesGraphShapes
         if valid:
-            for sg_shape in score_inst['shapesGraphShapes']:
+            for sg_shape in score_inst["shapesGraphShapes"]:
                 # If no constraint_shape provided, this score is not applicable
                 if constraint_shape is None:
                     valid = False
@@ -174,14 +187,14 @@ def score_widgets(
                     sg_shape,
                     shapes_graph,
                     widget_scoring_graph,
-                    logger
+                    logger,
                 ):
                     valid = False
                     break
 
         # If all validations passed (or no shapes to validate), record the result
         if valid:
-            results.append((score_inst['widget'], score_inst['score']))
+            results.append((score_inst["widget"], score_inst["score"]))
 
     # Step e: Aggregate Multiple Scores per Widget
     # When multiple Score instances reference the same widget, keep the maximum score
@@ -194,8 +207,7 @@ def score_widgets(
     # Create WidgetScore objects and sort
     # WidgetScore.__lt__ handles sorting: score descending, then widget IRI ascending
     widget_scores = [
-        WidgetScore(widget=w, score=s)
-        for w, s in widget_max_scores.items()
+        WidgetScore(widget=w, score=s) for w, s in widget_max_scores.items()
     ]
     widget_scores.sort()  # Uses WidgetScore.__lt__
 

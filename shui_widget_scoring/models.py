@@ -10,10 +10,11 @@ from rdflib import URIRef, BNode
 @dataclass(frozen=True)
 class WidgetScore:
     """Represents a widget with its calculated score."""
+
     widget: Union[URIRef, BNode]
     score: Decimal
 
-    def __lt__(self, other: 'WidgetScore') -> bool:
+    def __lt__(self, other: "WidgetScore") -> bool:
         """Enable sorting: first by score (desc), then by widget IRI (asc)."""
         if not isinstance(other, WidgetScore):
             return NotImplemented
@@ -26,6 +27,7 @@ class WidgetScore:
 @dataclass(frozen=True)
 class ScoringResult:
     """Result of widget scoring algorithm."""
+
     widget_scores: List[WidgetScore]
 
     @property
@@ -38,6 +40,8 @@ class ScoringResult:
         """Return the highest score, or None if no results."""
         return self.widget_scores[0].score if self.widget_scores else None
 
-    def get_widgets_with_min_score(self, min_score: Decimal = Decimal('0')) -> List[WidgetScore]:
+    def get_widgets_with_min_score(
+        self, min_score: Decimal = Decimal("0")
+    ) -> List[WidgetScore]:
         """Filter widgets with score >= min_score."""
         return [ws for ws in self.widget_scores if ws.score >= min_score]

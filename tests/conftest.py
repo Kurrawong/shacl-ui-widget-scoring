@@ -154,7 +154,9 @@ def malformed_scoring_graph_invalid_score_type():
 
     g.add((EX.MalformedScore, RDF.type, SHUI.Score))
     g.add((EX.MalformedScore, SHUI.widget, EX.SomeWidget))
-    g.add((EX.MalformedScore, SHUI.score, Literal("not a number")))  # String, not decimal/integer
+    g.add(
+        (EX.MalformedScore, SHUI.score, Literal("not a number"))
+    )  # String, not decimal/integer
 
     return g
 
@@ -163,7 +165,7 @@ def create_score_instance(
     widget: URIRef,
     score: Decimal,
     data_graph_shapes: list = None,
-    shapes_graph_shapes: list = None
+    shapes_graph_shapes: list = None,
 ) -> Graph:
     """
     Helper function to create a widget scoring graph with a single Score instance.

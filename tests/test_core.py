@@ -7,7 +7,11 @@ from rdflib import Graph, URIRef, Literal, BNode, Namespace
 from rdflib.namespace import RDF, XSD
 
 from shui_widget_scoring import score_widgets
-from shui_widget_scoring.exceptions import InvalidValueNodeError, MissingGraphError, MalformedScoreError
+from shui_widget_scoring.exceptions import (
+    InvalidValueNodeError,
+    MissingGraphError,
+    MalformedScoreError,
+)
 from shui_widget_scoring.namespaces import SHUI, SH
 
 EX = Namespace("http://example.org/")
@@ -16,7 +20,9 @@ EX = Namespace("http://example.org/")
 class TestScoreWidgetsBasic:
     """Basic tests for score_widgets function."""
 
-    def test_score_widgets_with_literal_value(self, simple_widget_scoring_graph, logger):
+    def test_score_widgets_with_literal_value(
+        self, simple_widget_scoring_graph, logger
+    ):
         """Test scoring widgets for a literal boolean value."""
         # Create a shapes graph with boolean shape
         shapes_graph = Graph()
@@ -30,7 +36,7 @@ class TestScoreWidgetsBasic:
         result = score_widgets(
             value_node=Literal(True),
             widget_scoring_graph=simple_widget_scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         # Should return BooleanSelectEditor (score 10) and TextEditor (score 1)
@@ -53,7 +59,7 @@ class TestScoreWidgetsBasic:
         result = score_widgets(
             value_node=Literal(True),  # Boolean, doesn't match date shape
             widget_scoring_graph=scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         assert len(result.widget_scores) == 0
@@ -82,7 +88,7 @@ class TestScoreWidgetsBasic:
         result = score_widgets(
             value_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         assert len(result.widget_scores) == 3
@@ -99,23 +105,29 @@ class TestScoreWidgetsBasic:
 
         # Widget Z with score 10
         scoring_graph.add((EX.ScoreZ, RDF.type, SHUI.Score))
-        scoring_graph.add((EX.ScoreZ, SHUI.widget, URIRef("http://example.org/ZWidget")))
+        scoring_graph.add(
+            (EX.ScoreZ, SHUI.widget, URIRef("http://example.org/ZWidget"))
+        )
         scoring_graph.add((EX.ScoreZ, SHUI.score, Literal(Decimal("10"))))
 
         # Widget A with score 10
         scoring_graph.add((EX.ScoreA, RDF.type, SHUI.Score))
-        scoring_graph.add((EX.ScoreA, SHUI.widget, URIRef("http://example.org/AWidget")))
+        scoring_graph.add(
+            (EX.ScoreA, SHUI.widget, URIRef("http://example.org/AWidget"))
+        )
         scoring_graph.add((EX.ScoreA, SHUI.score, Literal(Decimal("10"))))
 
         # Widget M with score 10
         scoring_graph.add((EX.ScoreM, RDF.type, SHUI.Score))
-        scoring_graph.add((EX.ScoreM, SHUI.widget, URIRef("http://example.org/MWidget")))
+        scoring_graph.add(
+            (EX.ScoreM, SHUI.widget, URIRef("http://example.org/MWidget"))
+        )
         scoring_graph.add((EX.ScoreM, SHUI.score, Literal(Decimal("10"))))
 
         result = score_widgets(
             value_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         assert len(result.widget_scores) == 3
@@ -132,15 +144,14 @@ class TestScoreWidgetsInputValidation:
         with pytest.raises(InvalidValueNodeError):
             score_widgets(
                 value_node="not a valid node",
-                widget_scoring_graph=simple_widget_scoring_graph
+                widget_scoring_graph=simple_widget_scoring_graph,
             )
 
     def test_uriref_value_node_requires_data_graph(self, simple_widget_scoring_graph):
         """Test that URIRef value_node requires data_graph."""
         with pytest.raises(MissingGraphError) as exc_info:
             score_widgets(
-                value_node=EX.someNode,
-                widget_scoring_graph=simple_widget_scoring_graph
+                value_node=EX.someNode, widget_scoring_graph=simple_widget_scoring_graph
             )
 
         assert "data_graph" in str(exc_info.value)
@@ -149,8 +160,7 @@ class TestScoreWidgetsInputValidation:
         """Test that BNode value_node requires data_graph."""
         with pytest.raises(MissingGraphError) as exc_info:
             score_widgets(
-                value_node=BNode(),
-                widget_scoring_graph=simple_widget_scoring_graph
+                value_node=BNode(), widget_scoring_graph=simple_widget_scoring_graph
             )
 
         assert "data_graph" in str(exc_info.value)
@@ -161,17 +171,19 @@ class TestScoreWidgetsInputValidation:
             score_widgets(
                 value_node=Literal("test"),
                 widget_scoring_graph=simple_widget_scoring_graph,
-                constraint_shape=EX.SomeShape
+                constraint_shape=EX.SomeShape,
             )
 
         assert "shapes_graph" in str(exc_info.value)
 
-    def test_malformed_scoring_graph_raises_error(self, malformed_scoring_graph_no_widget):
+    def test_malformed_scoring_graph_raises_error(
+        self, malformed_scoring_graph_no_widget
+    ):
         """Test that malformed widget scoring graph raises MalformedScoreError."""
         with pytest.raises(MalformedScoreError):
             score_widgets(
                 value_node=Literal("test"),
-                widget_scoring_graph=malformed_scoring_graph_no_widget
+                widget_scoring_graph=malformed_scoring_graph_no_widget,
             )
 
 
@@ -205,7 +217,7 @@ class TestScoreWidgetsWithConstraintShapes:
             widget_scoring_graph=scoring_graph,
             constraint_shape=EX.PropertyShape,
             shapes_graph=shapes_graph,
-            logger=logger
+            logger=logger,
         )
 
         assert len(result.widget_scores) == 1
@@ -225,7 +237,7 @@ class TestScoreWidgetsWithConstraintShapes:
         result = score_widgets(
             value_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
-            logger=logger
+            logger=logger,
         )
 
         # Score should not be applicable because constraint_shape is None
@@ -256,7 +268,7 @@ class TestScoreWidgetsDataGraphValidation:
             value_node=EX.item1,
             widget_scoring_graph=scoring_graph,
             data_graph=data_graph,
-            logger=logger
+            logger=logger,
         )
 
         assert len(result.widget_scores) == 1

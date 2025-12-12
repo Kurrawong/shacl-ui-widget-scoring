@@ -9,7 +9,7 @@ import pyshacl
 from rdflib import Graph, URIRef, BNode, Literal
 from rdflib.namespace import RDF
 
-from .namespaces import SHUI, SH, XSD
+from .namespaces import SHUI, SH
 from .exceptions import MalformedScoreError
 
 
@@ -54,11 +54,13 @@ shui:ScoreShape a sh:NodeShape ;
 def _get_meta_shapes_graph() -> Graph:
     """Get the meta-shapes graph for validating Score instances."""
     g = Graph()
-    g.parse(data=META_SHAPES_TTL, format='turtle')
+    g.parse(data=META_SHAPES_TTL, format="turtle")
     return g
 
 
-def validate_widget_scoring_graph(widget_scoring_graph: Graph, logger: Optional[logging.Logger] = None) -> None:
+def validate_widget_scoring_graph(
+    widget_scoring_graph: Graph, logger: Optional[logging.Logger] = None
+) -> None:
     """
     Validate the widget scoring graph against meta-shapes.
 
@@ -77,7 +79,7 @@ def validate_widget_scoring_graph(widget_scoring_graph: Graph, logger: Optional[
         conforms, results_graph, results_text = pyshacl.validate(
             data_graph=widget_scoring_graph,
             shacl_graph=meta_shapes_graph,
-            inference='none',
+            inference="none",
             abort_on_first=False,
         )
 
@@ -88,22 +90,22 @@ def validate_widget_scoring_graph(widget_scoring_graph: Graph, logger: Optional[
 
             # Try to find the first violation to provide a helpful error message
             from rdflib.namespace import SH as SHACL_NS
-            violations = list(results_graph.subjects(RDF.type, SHACL_NS.ValidationResult))
+
+            violations = list(
+                results_graph.subjects(RDF.type, SHACL_NS.ValidationResult)
+            )
             if violations:
                 first_violation = violations[0]
                 focus_node = results_graph.value(first_violation, SHACL_NS.focusNode)
                 message = results_graph.value(first_violation, SHACL_NS.resultMessage)
 
                 if focus_node and message:
-                    raise MalformedScoreError(
-                        str(focus_node),
-                        str(message)
-                    )
+                    raise MalformedScoreError(str(focus_node), str(message))
 
             # Fallback error message
             raise MalformedScoreError(
                 "unknown",
-                "Widget scoring graph contains malformed Score instances. Check logs for details."
+                "Widget scoring graph contains malformed Score instances. Check logs for details.",
             )
 
     except MalformedScoreError:
@@ -119,7 +121,7 @@ def validate_node_against_shape(
     shape: Union[URIRef, BNode],
     data_graph: Graph,
     shapes_graph: Graph,
-    logger: Optional[logging.Logger] = None
+    logger: Optional[logging.Logger] = None,
 ) -> bool:
     """
     Validate a focus node against a SHACL shape.
@@ -135,11 +137,19 @@ def validate_node_against_shape(
         True if validation passes (conforms), False if violations occur
     """
     try:
+        # Create a temporary SHACL graph that specifically targets the focus node with the shape
+        # This is necessary because the shapes in the scoring graph (shui:Score) do not have
+        # implicit targets (sh:targetClass, etc.) that match the focus node.
+        # We must explicitly link them for this validation session.
+        validation_shacl_graph = Graph()
+        validation_shacl_graph += shapes_graph
+        validation_shacl_graph.add((shape, SH.targetNode, focus_node))
+
         conforms, results_graph, results_text = pyshacl.validate(
             data_graph=data_graph,
-            shacl_graph=shapes_graph,
+            shacl_graph=validation_shacl_graph,
             advanced=True,
-            inference='none',
+            inference="none",
             abort_on_first=True,
         )
         return conforms
@@ -151,8 +161,7 @@ def validate_node_against_shape(
 
 
 def validate_score_instance(
-    score_uri: Union[URIRef, BNode],
-    widget_scoring_graph: Graph
+    score_uri: Union[URIRef, BNode], widget_scoring_graph: Graph
 ) -> Dict[str, Any]:
     """
     Validate a single Score instance and extract its properties.
@@ -170,18 +179,26 @@ def validate_score_instance(
     # Extract shui:widget (exactly one)
     widgets = list(widget_scoring_graph.objects(score_uri, SHUI.widget))
     if len(widgets) == 0:
-        raise MalformedScoreError(str(score_uri), "Score must have exactly one shui:widget")
+        raise MalformedScoreError(
+            str(score_uri), "Score must have exactly one shui:widget"
+        )
     if len(widgets) > 1:
-        raise MalformedScoreError(str(score_uri), "Score must have exactly one shui:widget (found multiple)")
+        raise MalformedScoreError(
+            str(score_uri), "Score must have exactly one shui:widget (found multiple)"
+        )
 
     widget = widgets[0]
 
     # Extract shui:score (exactly one)
     scores = list(widget_scoring_graph.objects(score_uri, SHUI.score))
     if len(scores) == 0:
-        raise MalformedScoreError(str(score_uri), "Score must have exactly one shui:score")
+        raise MalformedScoreError(
+            str(score_uri), "Score must have exactly one shui:score"
+        )
     if len(scores) > 1:
-        raise MalformedScoreError(str(score_uri), "Score must have exactly one shui:score (found multiple)")
+        raise MalformedScoreError(
+            str(score_uri), "Score must have exactly one shui:score (found multiple)"
+        )
 
     score_literal = scores[0]
 
@@ -190,22 +207,25 @@ def validate_score_instance(
         score_value = Decimal(str(score_literal))
     except (ValueError, TypeError, decimal.InvalidOperation) as e:
         raise MalformedScoreError(
-            str(score_uri),
-            f"shui:score must be a valid decimal or integer: {e}"
+            str(score_uri), f"shui:score must be a valid decimal or integer: {e}"
         )
 
     # Extract shui:dataGraphShape (zero or more)
-    data_graph_shapes = list(widget_scoring_graph.objects(score_uri, SHUI.dataGraphShape))
+    data_graph_shapes = list(
+        widget_scoring_graph.objects(score_uri, SHUI.dataGraphShape)
+    )
 
     # Extract shui:shapesGraphShape (zero or more)
-    shapes_graph_shapes = list(widget_scoring_graph.objects(score_uri, SHUI.shapesGraphShape))
+    shapes_graph_shapes = list(
+        widget_scoring_graph.objects(score_uri, SHUI.shapesGraphShape)
+    )
 
     return {
-        'uri': score_uri,
-        'widget': widget,
-        'score': score_value,
-        'dataGraphShapes': data_graph_shapes,
-        'shapesGraphShapes': shapes_graph_shapes,
+        "uri": score_uri,
+        "widget": widget,
+        "score": score_value,
+        "dataGraphShapes": data_graph_shapes,
+        "shapesGraphShapes": shapes_graph_shapes,
     }
 
 
