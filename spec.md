@@ -40,7 +40,7 @@ The Widget Scoring Model relies on instances of the class `shui:Score` to define
 
 ### 3.1. Namespace
 
-The namespace for this ontology is `http://www.w3.org/ns/shui#`. The prefix `shui` is used throughout this document.
+The namespace for this ontology is `http://www.w3.org/ns/shacl-ui#`. The prefix `shui` is used throughout this document.
 
 ### 3.2. Class: shui:Score
 
@@ -137,7 +137,7 @@ The following examples illustrate the usage of the scoring model.
 
 ```turtle
 PREFIX sh: <http://www.w3.org/ns/shacl#>
-PREFIX shui: <http://www.w3.org/ns/shui#>
+PREFIX shui: <http://www.w3.org/ns/shacl-ui#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 # A shape that matches boolean values in the data graph
