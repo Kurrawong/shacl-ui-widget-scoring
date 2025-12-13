@@ -39,7 +39,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Running the Application
 
-- **Run the demo application**: `uv run python main.py`
+- **Run the examples**: `uv run python example.py`
 - **Run a specific Python script**: `uv run python script_name.py`
 
 ### Testing
@@ -99,8 +99,7 @@ tests/
 
 ### Entry Points
 
-- **`main.py`**: Demo/CLI application showing various scoring scenarios with Turtle-based shape definitions
-- **`example.py`**: Extended examples demonstrating more complex scoring scenarios
+- **`example.py`**: Examples demonstrating the widget scoring algorithm with comprehensive Turtle-based RDF definitions
 - **Public API** (defined in `__init__.py`, import from package root):
   - `score_widgets()` - Main function for scoring widgets
   - `WidgetScore` - Data structure for individual widget scores
@@ -167,8 +166,8 @@ To verify everything is working correctly:
 # 1. Install dependencies
 uv sync --extra dev
 
-# 2. Run the demo application
-uv run python main.py
+# 2. Run the examples
+uv run python example.py
 
 # 3. Run the test suite
 uv run pytest
