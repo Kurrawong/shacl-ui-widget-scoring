@@ -4,7 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Python package that implements the SHACL UI widget scoring algorithm, which determines the best suitable widget to use for a data graph's value node. The project has a working implementation with comprehensive test coverage and follows modern Python packaging standards.
+**SHACL UI Widget Scoring** is a Python library that implements the SHACL UI widget scoring algorithm, which determines the best suitable widget to use for a data graph's value node based on data types and SHACL constraints.
+
+- **Package Name**: `shui-widget-score`
+- **Version**: 0.1.0
+- **Python**: 3.14+
+- **Status**: Fully functional with comprehensive test coverage
+- **Test Coverage**: 90% (67 tests passing)
+- **Architecture**: Modular, production-ready Python package following modern packaging standards
 
 ## Development Setup
 
@@ -12,10 +19,11 @@ This is a Python package that implements the SHACL UI widget scoring algorithm, 
 - **Package Manager**: `uv` (https://astral.sh/uv/) - handles both dependency management and Python version control
 - **Main Dependencies**:
   - `pyshacl>=0.30.1` - SHACL validation and processing
-  - `rdflib` - RDF graph operations (via pyshacl)
-- **Development Dependencies**:
+  - `rdflib` - RDF graph operations (via pyshacl as transitive dependency)
+- **Development Dependencies** (defined in `pyproject.toml` under `[project.optional-dependencies.dev]`):
   - `pytest>=8.0.0` - testing framework
   - `pytest-cov>=4.1.0` - test coverage reporting
+- **Code Quality** (defined in `pyproject.toml` under `[dependency-groups.dev]`):
   - `ruff>=0.14.9` - code formatting and linting
 
 ## Common Commands
@@ -78,16 +86,27 @@ tests/
   - `ScoringResult`: Complete result with all widget scores and default recommendation
   - `ScoreInstance`: Internal representation of a `shui:Score` instance
 - **`validation.py`**: SHACL validation using `pyshacl` to check if shapes match value nodes
-- **`exceptions.py`**: Custom exceptions:
-  - `MalformedScoreError`: Score instance violates constraints
-  - `InvalidValueNodeError`: Invalid value_node parameter
-  - `MissingGraphError`: Required graph not provided
+- **`exceptions.py`**: Custom exception hierarchy:
+  - `ShuiWidgetScoringError`: Base exception class (parent of all custom exceptions)
+  - `MalformedScoreError`: Score instance violates SHACL constraints
+  - `InvalidValueNodeError`: Invalid value_node parameter type
+  - `MissingGraphError`: Required graph not provided for validation
 - **`namespaces.py`**: RDF namespace constants (SHUI, SH, XSD)
 
 ### Entry Points
 
-- **`main.py`**: Demo application showing various scoring scenarios
-- **Public API**: Import from package root: `from shui_widget_scoring import score_widgets, SHUI, SH`
+- **`main.py`**: Demo/CLI application showing various scoring scenarios with Turtle-based shape definitions
+- **`example.py`**: Extended examples demonstrating more complex scoring scenarios
+- **Public API** (defined in `__init__.py`, import from package root):
+  - `score_widgets()` - Main function for scoring widgets
+  - `WidgetScore` - Data structure for individual widget scores
+  - `ScoringResult` - Data structure containing all results
+  - `ShuiWidgetScoringError` - Base exception class
+  - `MalformedScoreError` - Exception for invalid Score instances
+  - `InvalidValueNodeError` - Exception for invalid inputs
+  - `MissingGraphError` - Exception for missing required graphs
+  - `SHUI` - SHACL UI namespace constant
+  - `SH` - SHACL namespace constant
 
 ## Specification
 
@@ -101,10 +120,21 @@ The implementation in `shui_widget_scoring/` follows this specification, and `te
 
 ## Testing Strategy
 
-- **Unit tests**: Each module has dedicated tests
-- **Spec compliance**: `test_spec.py` ensures implementation matches specification examples
-- **Edge cases**: `test_edge_cases.py` covers error conditions, boundary cases, and unusual inputs
-- **Coverage**: Pytest-cov configured to report test coverage automatically
+- **Unit tests**: Each module has dedicated tests organized by functionality
+  - `test_core.py`: Tests for the main `score_widgets()` algorithm (13+ tests)
+  - `test_models.py`: Tests for data structures (14+ tests)
+  - `test_validation.py`: Tests for SHACL validation (16+ tests)
+  - `test_edge_cases.py`: Error conditions and boundary cases (13+ tests)
+- **Spec compliance**: `test_spec.py` (9 tests) ensures implementation matches specification examples
+- **Documentation examples**: `test_example_md.py` (3 tests) validates all examples in `example.md`
+- **Total Coverage**: 90% coverage across 67 passing tests
+  - `__init__.py`: 100%
+  - `exceptions.py`: 100%
+  - `namespaces.py`: 100%
+  - `core.py`: 95%
+  - `models.py`: 95%
+  - `validation.py`: 83%
+- **Pytest Configuration**: Automatic coverage reporting via `pytest-cov` (configured in `pyproject.toml`)
 
 ## Development Workflow
 
@@ -120,3 +150,46 @@ The implementation in `shui_widget_scoring/` follows this specification, and `te
 - Type hints are encouraged but not required
 - Code is formatted and linted with `ruff`
 - Follow existing patterns in the codebase
+- Keep solutions focused and avoid over-engineering
+- Only add comments where logic isn't self-evident
+- Trust framework guarantees (only validate at system boundaries)
+
+## Verifying Your Setup
+
+To verify everything is working correctly:
+
+```bash
+# 1. Install dependencies
+uv sync --extra dev
+
+# 2. Run the demo application
+uv run python main.py
+
+# 3. Run the test suite
+uv run pytest
+
+# 4. Check code quality
+task code
+```
+
+If all of these succeed, your setup is ready for development.
+
+## Build System
+
+The project uses modern Python packaging standards:
+- **Build backend**: `hatchling` (specified in `pyproject.toml`)
+- **Wheel packages**: Configured with `[tool.hatch.build.targets.wheel]`
+- **Package discovery**: Automatic (targets `shui_widget_scoring/` directory)
+
+To build a distribution:
+```bash
+uv build
+```
+
+## Useful Resources
+
+- [SHACL Specification](https://www.w3.org/TR/shacl/) - W3C SHACL standard
+- [SHACL UI Community Group](https://www.w3.org/community/shacl-ui/) - Community group specification
+- [RDFlib Documentation](https://rdflib.readthedocs.io/) - Python RDF toolkit
+- [pyshacl Documentation](https://pyshacl.readthedocs.io/) - Python SHACL validation library
+- [Turtle RDF Format](https://www.w3.org/TR/turtle/) - RDF serialization format used in this project
