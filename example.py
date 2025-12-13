@@ -274,28 +274,14 @@ def run_example_1(
     print("-" * 80)
     print(data_graph.serialize(format="turtle"))
 
-    # Serialize data graph shapes
-    dg_shapes = [
-        SHUI.isBoolean,
-        SHUI.isDate,
-        SHUI.isNotLiteral,
-    ]
     print("\nData Graph Shapes:")
     print("-" * 80)
     print(serialize_graph_section(data_graph_shapes, ""))
 
-    # Serialize shapes graph shapes
-    sg_shapes = [
-        SHUI.hasDatatype,
-        SHUI.hasDateDatatype,
-        SHUI.literalNoDatatypeSpecified,
-        SHUI.hasNonLiteralNodeKind,
-    ]
     print("\nShapes Graph Shapes:")
     print("-" * 80)
     print(serialize_graph_section(shapes_graph_shapes, ""))
 
-    score_instances = list(scoring_graph.subjects(RDF.type, SHUI.Score))
     print("\nWidget Scoring Graph - Widget Scores:")
     print("-" * 80)
     print(serialize_graph_section(scoring_graph, ""))
@@ -345,28 +331,14 @@ def run_example_2(
     print("-" * 80)
     print(shapes_graph.serialize(format="turtle"))
 
-    # Serialize data graph shapes
-    dg_shapes = [
-        SHUI.isBoolean,
-        SHUI.isDate,
-        SHUI.isNotLiteral,
-    ]
     print("\nData Graph Shapes:")
     print("-" * 80)
     print(serialize_graph_section(data_graph_shapes, ""))
 
-    # Serialize shapes graph shapes
-    sg_shapes = [
-        SHUI.hasDatatype,
-        SHUI.hasDateDatatype,
-        SHUI.literalNoDatatypeSpecified,
-        SHUI.hasNonLiteralNodeKind,
-    ]
     print("\nShapes Graph Shapes:")
     print("-" * 80)
     print(serialize_graph_section(shapes_graph_shapes, ""))
 
-    score_instances = list(scoring_graph.subjects(RDF.type, SHUI.Score))
     print("\nWidget Scoring Graph - Widget Scores:")
     print("-" * 80)
     print(serialize_graph_section(scoring_graph, ""))
@@ -419,28 +391,14 @@ def run_example_3(
     print("-" * 80)
     print(shapes_graph.serialize(format="turtle"))
 
-    # Serialize data graph shapes
-    dg_shapes = [
-        SHUI.isBoolean,
-        SHUI.isDate,
-        SHUI.isNotLiteral,
-    ]
     print("\nData Graph Shapes:")
     print("-" * 80)
     print(serialize_graph_section(data_graph_shapes, ""))
 
-    # Serialize shapes graph shapes
-    sg_shapes = [
-        SHUI.hasDatatype,
-        SHUI.hasDateDatatype,
-        SHUI.literalNoDatatypeSpecified,
-        SHUI.hasNonLiteralNodeKind,
-    ]
     print("\nShapes Graph Shapes:")
     print("-" * 80)
     print(serialize_graph_section(shapes_graph_shapes, ""))
 
-    score_instances = list(scoring_graph.subjects(RDF.type, SHUI.Score))
     print("\nWidget Scoring Graph - Widget Scores:")
     print("-" * 80)
     print(serialize_graph_section(scoring_graph, ""))
