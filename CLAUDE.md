@@ -29,6 +29,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Common Commands
 
 ### Dependency Management
+
 - **Install/Update dependencies**: `uv sync` (installs all dependencies from `pyproject.toml` and `uv.lock`)
 - **Install with dev dependencies**: `uv sync --extra dev` (includes pytest and other dev tools)
 - **Add a new dependency**: `uv add package_name` (updates both `pyproject.toml` and `uv.lock`)
@@ -37,10 +38,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Check for dependency updates**: `uv lock --upgrade`
 
 ### Running the Application
+
 - **Run the demo application**: `uv run python main.py`
 - **Run a specific Python script**: `uv run python script_name.py`
 
 ### Testing
+
 - **Run all tests**: `uv run pytest`
 - **Run tests with coverage**: `uv run pytest` (coverage enabled by default in `pyproject.toml`)
 - **Run specific test file**: `uv run pytest tests/test_core.py`
@@ -48,6 +51,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Run specific test**: `uv run pytest tests/test_core.py::test_function_name`
 
 ### Code Quality
+
 - **Format and lint code**: `task code` (runs ruff format + ruff check --fix)
 - **Format code only**: `uv run ruff format .`
 - **Lint code only**: `uv run ruff check --fix .`
@@ -111,6 +115,7 @@ tests/
 ## Specification
 
 The complete algorithm specification is defined in `spec.md`, which includes:
+
 - SHACL UI scoring rules and semantics
 - Shape validation requirements
 - Edge cases and error handling
@@ -177,14 +182,45 @@ If all of these succeed, your setup is ready for development.
 ## Build System
 
 The project uses modern Python packaging standards:
+
 - **Build backend**: `hatchling` (specified in `pyproject.toml`)
 - **Wheel packages**: Configured with `[tool.hatch.build.targets.wheel]`
 - **Package discovery**: Automatic (targets `shui_widget_scoring/` directory)
 
 To build a distribution:
+
 ```bash
 uv build
 ```
+
+## Claude Code Planning Rules
+
+When working on implementation tasks, follow these planning guidelines:
+
+### Planning Rules
+
+- Plans must be concise and execution-focused
+- Plans describe actions, not implementations
+- Do not include thinking, reasoning, explanations, or alternatives
+- Do not restate the problem
+- List only the tasks to perform and the order to perform them
+- Use bullets only; one sentence per step
+- Do not include code blocks, diffs, or before/after examples in plans
+
+### Clarifying Questions
+
+- If any clarifying questions are required, ask them first
+- Do not produce a plan until all clarifying questions have been answered
+
+### Implementation Phase
+
+- Implementation is a separate step from planning
+- Implementation may list files and approximate locations to change
+- Do not include current code or rewritten code by default
+- Describe changes in one or two sentences per file
+- Only include code snippets when strictly necessary to clarify the task
+- Include brief context explaining the reasoning behind each implementation step, if needed to clarify the task.
+- The goal is to minimize output while keeping plans unambiguous and actionable.
 
 ## Useful Resources
 
