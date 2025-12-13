@@ -8,12 +8,11 @@ shapes graphs, and their constraints.
 
 import json
 from decimal import Decimal
-from typing import Dict, List, Tuple
+from typing import List
 
-from rdflib import Graph, Literal, Namespace, URIRef, RDF, BNode
-from rdflib.namespace import XSD, RDFS
+from rdflib import Graph, Literal, Namespace, URIRef, RDF
 
-from shui_widget_scoring import score_widgets, SHUI, SH, WidgetScore, ScoringResult
+from shui_widget_scoring import score_widgets, SHUI, ScoringResult
 
 # Define namespaces
 EX = Namespace("https://example.com/")

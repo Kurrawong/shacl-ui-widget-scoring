@@ -3,9 +3,8 @@
 import pytest
 from decimal import Decimal
 from rdflib import Graph, Literal, Namespace
-from rdflib.namespace import RDF, XSD
 
-from shui_widget_scoring import score_widgets, SHUI, SH
+from shui_widget_scoring import score_widgets, SHUI
 
 EX = Namespace("https://example.com/")
 SCHEMA = Namespace("https://schema.org/")
@@ -197,7 +196,9 @@ class TestExampleMd:
         )
 
         # Verify we get BooleanSelectEditor with score 10 and 0
-        boolean_scores = [ws for ws in result.widget_scores if ws.widget == SHUI.BooleanSelectEditor]
+        boolean_scores = [
+            ws for ws in result.widget_scores if ws.widget == SHUI.BooleanSelectEditor
+        ]
         assert len(boolean_scores) >= 2
         scores = [ws.score for ws in boolean_scores]
         assert Decimal("10") in scores

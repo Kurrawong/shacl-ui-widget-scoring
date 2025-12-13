@@ -111,7 +111,9 @@ def score_widgets(
             # For Literal value nodes, use a simple datatype check or fallback to pyshacl
             if isinstance(value_node, Literal):
                 # Check if shape is defined in the data graph shapes graph
-                shape_triples = list(data_graph_shapes_graph.predicate_objects(dg_shape))
+                shape_triples = list(
+                    data_graph_shapes_graph.predicate_objects(dg_shape)
+                )
                 if not shape_triples:
                     # Shape is not defined, validation fails
                     valid = False
@@ -200,7 +202,9 @@ def score_widgets(
                 else:
                     # No constraint_shape provided, validate using shape's own targets
                     # If shapes_graph is None, create an empty graph for validation
-                    graph_to_validate = shapes_graph if shapes_graph is not None else Graph()
+                    graph_to_validate = (
+                        shapes_graph if shapes_graph is not None else Graph()
+                    )
                     if not validate_graph_against_shape(
                         graph_to_validate,
                         sg_shape,
@@ -216,9 +220,7 @@ def score_widgets(
 
     # Step e: Create WidgetScore objects (NO deduplication)
     # All matching score instances should be returned, even if same widget
-    widget_scores = [
-        WidgetScore(widget=w, score=s) for w, s in results
-    ]
+    widget_scores = [WidgetScore(widget=w, score=s) for w, s in results]
     widget_scores.sort()  # Uses WidgetScore.__lt__
 
     return ScoringResult(widget_scores=widget_scores)
