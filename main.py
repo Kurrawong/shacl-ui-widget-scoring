@@ -3,9 +3,9 @@
 from decimal import Decimal
 
 from rdflib import Graph, Literal, Namespace
-from rdflib.namespace import RDF, XSD
+from rdflib.namespace import XSD
 
-from shui_widget_scoring import score_widgets, SHUI, SH
+from shui_widget_scoring import score_widgets
 
 
 # Define example namespace
@@ -16,43 +16,61 @@ def create_example_shapes_and_scores():
     """Create example widget scoring graph with shapes and scores."""
     scoring_graph = Graph()
 
-    # Define shapes for data graph validation
-    # Boolean shape
-    scoring_graph.add((EX.BooleanShape, RDF.type, SH.NodeShape))
-    scoring_graph.add((EX.BooleanShape, SH.datatype, XSD.boolean))
+    # Define shapes for data graph validation and Score instances using Turtle
+    turtle_data = """
+        PREFIX shui: <http://www.w3.org/ns/shacl-ui#>
+        PREFIX sh: <http://www.w3.org/ns/shacl#>
+        PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+        PREFIX ex: <http://example.org/>
 
-    # Date shape
-    scoring_graph.add((EX.DateShape, RDF.type, SH.NodeShape))
-    scoring_graph.add((EX.DateShape, SH.datatype, XSD.date))
+        # Define shapes for data graph validation
 
-    # String shape
-    scoring_graph.add((EX.StringShape, RDF.type, SH.NodeShape))
-    scoring_graph.add((EX.StringShape, SH.datatype, XSD.string))
+        # Boolean shape
+        ex:BooleanShape
+            a sh:NodeShape ;
+            sh:datatype xsd:boolean .
 
-    # Define Score instances
-    # High score for boolean values → BooleanSelectEditor
-    scoring_graph.add((EX.BooleanScore, RDF.type, SHUI.Score))
-    scoring_graph.add((EX.BooleanScore, SHUI.widget, EX.BooleanSelectEditor))
-    scoring_graph.add((EX.BooleanScore, SHUI.score, Literal(Decimal("10"))))
-    scoring_graph.add((EX.BooleanScore, SHUI.dataGraphShape, EX.BooleanShape))
+        # Date shape
+        ex:DateShape
+            a sh:NodeShape ;
+            sh:datatype xsd:date .
 
-    # Medium score for date values → DatePickerEditor
-    scoring_graph.add((EX.DateScore, RDF.type, SHUI.Score))
-    scoring_graph.add((EX.DateScore, SHUI.widget, EX.DatePickerEditor))
-    scoring_graph.add((EX.DateScore, SHUI.score, Literal(Decimal("8"))))
-    scoring_graph.add((EX.DateScore, SHUI.dataGraphShape, EX.DateShape))
+        # String shape
+        ex:StringShape
+            a sh:NodeShape ;
+            sh:datatype xsd:string .
 
-    # Low score for string values → TextEditor
-    scoring_graph.add((EX.StringScore, RDF.type, SHUI.Score))
-    scoring_graph.add((EX.StringScore, SHUI.widget, EX.TextEditor))
-    scoring_graph.add((EX.StringScore, SHUI.score, Literal(Decimal("5"))))
-    scoring_graph.add((EX.StringScore, SHUI.dataGraphShape, EX.StringShape))
+        # Define Score instances
 
-    # Fallback score for any value → GenericEditor
-    scoring_graph.add((EX.FallbackScore, RDF.type, SHUI.Score))
-    scoring_graph.add((EX.FallbackScore, SHUI.widget, EX.GenericEditor))
-    scoring_graph.add((EX.FallbackScore, SHUI.score, Literal(Decimal("1"))))
+        # High score for boolean values → BooleanSelectEditor
+        ex:BooleanScore
+            a shui:Score ;
+            shui:dataGraphShape ex:BooleanShape ;
+            shui:score 10.0 ;
+            shui:widget ex:BooleanSelectEditor .
 
+        # Medium score for date values → DatePickerEditor
+        ex:DateScore
+            a shui:Score ;
+            shui:dataGraphShape ex:DateShape ;
+            shui:score 8.0 ;
+            shui:widget ex:DatePickerEditor .
+
+        # Low score for string values → TextEditor
+        ex:StringScore
+            a shui:Score ;
+            shui:dataGraphShape ex:StringShape ;
+            shui:score 5.0 ;
+            shui:widget ex:TextEditor .
+
+        # Fallback score for any value → GenericEditor
+        ex:FallbackScore
+            a shui:Score ;
+            shui:score 1.0 ;
+            shui:widget ex:GenericEditor .
+    """
+
+    scoring_graph.parse(data=turtle_data, format="turtle")
     return scoring_graph
 
 
