@@ -120,7 +120,7 @@ def validate_node_against_shape(
     focus_node: Union[URIRef, BNode, Literal],
     shape: Union[URIRef, BNode],
     data_graph: Graph,
-    shapes_graph: Graph,
+    shape_definitions_graph: Graph,
     logger: Optional[logging.Logger] = None,
 ) -> bool:
     """
@@ -130,7 +130,7 @@ def validate_node_against_shape(
         focus_node: The node to validate
         shape: The SHACL shape to validate against
         data_graph: The data graph containing the focus node
-        shapes_graph: The shapes graph containing the shape definition
+        shape_definitions_graph: The graph containing the shape definition
         logger: Optional logger for warnings
 
     Returns:
@@ -142,7 +142,7 @@ def validate_node_against_shape(
         # implicit targets (sh:targetClass, etc.) that match the focus node.
         # We must explicitly link them for this validation session.
         validation_shacl_graph = Graph()
-        validation_shacl_graph += shapes_graph
+        validation_shacl_graph += shape_definitions_graph
         validation_shacl_graph.add((shape, SH.targetNode, focus_node))
 
         conforms, results_graph, results_text = pyshacl.validate(
@@ -157,6 +157,47 @@ def validate_node_against_shape(
         # Malformed shape or validation error
         if logger:
             logger.warning(f"Shape validation failed for shape {shape}: {e}")
+        return False
+
+
+def validate_graph_against_shape(
+    data_graph: Graph,
+    shape: Union[URIRef, BNode],
+    shape_definitions_graph: Graph,
+    logger: Optional[logging.Logger] = None,
+) -> bool:
+    """
+    Validate a data graph against a SHACL shape using the shape's own targets.
+
+    Unlike validate_node_against_shape which validates a specific focus node,
+    this function relies on the shape's declared targets (sh:targetClass,
+    sh:targetNode, sh:targetSubjectsOf, etc.) to determine what to validate.
+
+    If the shape has no declared targets, validation will pass trivially
+    (no violations because there's nothing to check).
+
+    Args:
+        data_graph: The data graph to validate
+        shape: The SHACL shape to validate against
+        shape_definitions_graph: The graph containing the shape definition
+        logger: Optional logger for warnings
+
+    Returns:
+        True if validation passes (conforms), False if violations occur
+    """
+    try:
+        conforms, results_graph, results_text = pyshacl.validate(
+            data_graph=data_graph,
+            shacl_graph=shape_definitions_graph,
+            advanced=True,
+            inference="none",
+            abort_on_first=True,
+        )
+        return conforms
+    except Exception as e:
+        # Malformed shape or validation error
+        if logger:
+            logger.warning(f"Graph validation failed for shape {shape}: {e}")
         return False
 
 

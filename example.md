@@ -22,7 +22,7 @@ shui:isDate a sh:NodeShape ;
 .
 
 shui:isNotLiteral a sh:NodeShape ;
-    sh:nodeKind (sh:BlankNode sh:IRI sh:TripleTerm) ;
+    sh:nodeKind sh:BlankNodeOrIRI ;
 .
 ```
 
@@ -56,11 +56,18 @@ shui:literalNoDatatypeSpecified a sh:NodeShape ;
       sh:path sh:nodeKind ;
       sh:hasValue sh:Literal ;
     ] ;
-    
+
     # The shape must not have the sh:datatype constraint.
     sh:property [
       sh:path sh:datatype ;
       sh:maxCount 0
+    ] ;
+.
+
+shui:hasNonLiteralNodeKind a sh:NodeShape ;
+    sh:property [
+      sh:path sh:nodeKind ;
+      sh:in (sh:BlankNodeOrIRI sh:IRI sh:BlankNode)
     ] ;
 .
 ```
@@ -83,9 +90,23 @@ shui:booleanSelectEditorScore10 a shui:Score ;
     shui:score 10 ;
 .
 
-shui:booleanSelectEditorScore0 a shui:Score ;
+# Score 0 if data graph value node is not a literal
+shui:booleanSelectEditorScore0-isNotLiteral a shui:Score ;
     shui:dataGraphShape shui:isNotLiteral ;
+    shui:widget shui:BooleanSelectEditor ;
+    shui:score 0 ;
+.
+
+# Score 0 if shapes graph constraint shape has sh:datatype
+shui:booleanSelectEditorScore0-hasDatatype a shui:Score ;
     shui:shapesGraphShape shui:hasDatatype ;
+    shui:widget shui:BooleanSelectEditor ;
+    shui:score 0 ;
+.
+
+# Score 0 if shapes graph constraint shape has sh:nodeKind with non-literal values
+shui:booleanSelectEditorScore0-hasNonLiteralNodeKind a shui:Score ;
+    shui:shapesGraphShape shui:hasNonLiteralNodeKind ;
     shui:widget shui:BooleanSelectEditor ;
     shui:score 0 ;
 .
@@ -156,7 +177,7 @@ ex:Person-isAdmin a sh:NodeShape ;
   sh:targetClass schema:Person ;
   sh:property [
     sh:path ex:isAdmin ;
-    sh:nodeKind (sh:BlankNode sh:IRI sh:TripleTerm)
+    sh:nodeKind sh:BlankNodeOrIRI
   ]
 .
 ```
@@ -168,7 +189,7 @@ Results:
     "shui:widget": "shui:BooleanSelectEditor",
     "shui:score": 10
   },
-  "shui:booleanSelectEditorScore0": {
+  "shui:booleanSelectEditorScore0-hasNonLiteralNodeKind": {
     "shui:widget": "shui:BooleanSelectEditor",
     "shui:score": 0
   }

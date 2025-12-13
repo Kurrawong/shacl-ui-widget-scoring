@@ -223,15 +223,15 @@ class TestScoreWidgetsWithConstraintShapes:
         assert len(result.widget_scores) == 1
         assert result.default_widget == EX.SpecialWidget
 
-    def test_score_without_constraint_shape_when_required(self, logger):
-        """Test that Score requiring shapesGraphShape fails when no constraint_shape provided."""
+    def test_score_with_shapesGraphShape_no_constraint_shape(self, logger):
+        """Test that Score with shapesGraphShape validates using shape's own targets when no constraint_shape provided."""
         scoring_graph = Graph()
         scoring_graph.add((EX.Score1, RDF.type, SHUI.Score))
         scoring_graph.add((EX.Score1, SHUI.widget, EX.SpecialWidget))
         scoring_graph.add((EX.Score1, SHUI.score, Literal(Decimal("10"))))
         scoring_graph.add((EX.Score1, SHUI.shapesGraphShape, EX.SomeShape))
 
-        # Add a minimal shape to the scoring graph
+        # Add a minimal shape to the scoring graph (no targets, so it validates trivially)
         scoring_graph.add((EX.SomeShape, RDF.type, SH.NodeShape))
 
         result = score_widgets(
@@ -240,8 +240,10 @@ class TestScoreWidgetsWithConstraintShapes:
             logger=logger,
         )
 
-        # Score should not be applicable because constraint_shape is None
-        assert len(result.widget_scores) == 0
+        # Score should be applicable - the shape validates without requiring constraint_shape
+        assert len(result.widget_scores) == 1
+        assert result.widget_scores[0].widget == EX.SpecialWidget
+        assert result.widget_scores[0].score == Decimal("10")
 
 
 class TestScoreWidgetsDataGraphValidation:

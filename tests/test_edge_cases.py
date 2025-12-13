@@ -174,8 +174,8 @@ class TestZeroScores:
 class TestMultipleScoresPerWidget:
     """Test edge case 6.4: Multiple Scores for Same Widget from spec."""
 
-    def test_multiple_scores_same_widget_uses_max(self, logger):
-        """Test that when multiple Scores reference the same widget, max score wins."""
+    def test_multiple_scores_same_widget_returns_all(self, logger):
+        """Test that when multiple Scores reference the same widget, ALL scores are returned."""
         scoring_graph = Graph()
 
         # First score for BooleanSelectEditor
@@ -199,10 +199,21 @@ class TestMultipleScoresPerWidget:
             logger=logger,
         )
 
-        # Should have only one result for BooleanSelectEditor with max score
-        assert len(result.widget_scores) == 1
+        # Should have ALL three results for BooleanSelectEditor
+        assert len(result.widget_scores) == 3
+
+        # Results should be sorted by score descending
         assert result.widget_scores[0].widget == EX.BooleanSelectEditor
         assert result.widget_scores[0].score == Decimal("10")
+
+        assert result.widget_scores[1].widget == EX.BooleanSelectEditor
+        assert result.widget_scores[1].score == Decimal("5")
+
+        assert result.widget_scores[2].widget == EX.BooleanSelectEditor
+        assert result.widget_scores[2].score == Decimal("2")
+
+        # Default widget should still be highest score
+        assert result.default_score == Decimal("10")
 
     def test_multiple_scores_different_conditions(self, logger):
         """Test multiple scores for same widget with different conditions."""
@@ -226,44 +237,18 @@ class TestMultipleScoresPerWidget:
         scoring_graph.add((EX.FallbackScore, SHUI.widget, EX.BooleanSelectEditor))
         scoring_graph.add((EX.FallbackScore, SHUI.score, Literal(Decimal("5"))))
 
-        # Test with boolean value - both scores should match, max wins
+        # Test with boolean value - both scores should match, both returned
         result = score_widgets(
             value_node=Literal(True), widget_scoring_graph=scoring_graph, logger=logger
         )
 
-        assert len(result.widget_scores) == 1
+        # Both scores should be returned
+        assert len(result.widget_scores) == 2
         assert result.widget_scores[0].score == Decimal("10")
+        assert result.widget_scores[1].score == Decimal("5")
 
-
-class TestMissingConstraintShape:
-    """Test edge case 6.5: Missing Constraint Shape with shapesGraphShape from spec."""
-
-    def test_missing_constraint_shape_makes_score_not_applicable(self, logger):
-        """Test that Score with shapesGraphShape is not applicable when no constraint_shape provided."""
-        scoring_graph = Graph()
-
-        # Score that requires checking the constraint shape
-        scoring_graph.add((EX.ShapeCheckScore, RDF.type, SHUI.Score))
-        scoring_graph.add((EX.ShapeCheckScore, SHUI.widget, EX.SpecialWidget))
-        scoring_graph.add((EX.ShapeCheckScore, SHUI.score, Literal(Decimal("10"))))
-        scoring_graph.add(
-            (EX.ShapeCheckScore, SHUI.shapesGraphShape, EX.SomeShapeCheck)
-        )
-
-        # Add minimal shape to scoring graph
-        from shui_widget_scoring.namespaces import SH
-
-        scoring_graph.add((EX.SomeShapeCheck, RDF.type, SH.NodeShape))
-
-        # Call without constraint_shape
-        result = score_widgets(
-            value_node=Literal("test"),
-            widget_scoring_graph=scoring_graph,
-            logger=logger,
-        )
-
-        # Score should not be applicable
-        assert len(result.widget_scores) == 0
+        # Default should be highest score
+        assert result.default_score == Decimal("10")
 
 
 class TestLiteralVsNodeValueNodes:

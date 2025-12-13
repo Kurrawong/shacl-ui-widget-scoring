@@ -12,6 +12,7 @@ from .validation import (
     validate_widget_scoring_graph,
     extract_score_instances,
     validate_node_against_shape,
+    validate_graph_against_shape,
 )
 from .exceptions import InvalidValueNodeError, MissingGraphError
 
@@ -22,6 +23,8 @@ def score_widgets(
     data_graph: Optional[Graph] = None,
     constraint_shape: Optional[Union[URIRef, BNode]] = None,
     shapes_graph: Optional[Graph] = None,
+    data_graph_shapes_graph: Optional[Graph] = None,
+    shapes_graph_shapes_graph: Optional[Graph] = None,
     logger: Optional[logging.Logger] = None,
 ) -> ScoringResult:
     """
@@ -38,6 +41,8 @@ def score_widgets(
         data_graph: The data graph containing the value node (optional for Literals)
         constraint_shape: The SHACL shape constraining the value node (optional)
         shapes_graph: The shapes graph containing constraint_shape (required if constraint_shape provided)
+        data_graph_shapes_graph: Graph containing shapes for dataGraphShape validation (defaults to widget_scoring_graph)
+        shapes_graph_shapes_graph: Graph containing shapes for shapesGraphShape validation (defaults to widget_scoring_graph)
         logger: Optional logger for warnings and debug messages
 
     Returns:
@@ -65,6 +70,13 @@ def score_widgets(
         ... )
         >>> print(result.default_widget)  # Highest-scoring widget
     """
+    # Backward compatibility: if separate shape graphs not provided,
+    # use widget_scoring_graph (old behavior)
+    if data_graph_shapes_graph is None:
+        data_graph_shapes_graph = widget_scoring_graph
+    if shapes_graph_shapes_graph is None:
+        shapes_graph_shapes_graph = widget_scoring_graph
+
     # Step a: Validate Widget Scoring Graph
     # This ensures all Score instances are well-formed before processing
     validate_widget_scoring_graph(widget_scoring_graph, logger=logger)
@@ -98,20 +110,20 @@ def score_widgets(
         for dg_shape in score_inst["dataGraphShapes"]:
             # For Literal value nodes, use a simple datatype check or fallback to pyshacl
             if isinstance(value_node, Literal):
-                # Check if shape is defined in the scoring graph
-                shape_triples = list(widget_scoring_graph.predicate_objects(dg_shape))
+                # Check if shape is defined in the data graph shapes graph
+                shape_triples = list(data_graph_shapes_graph.predicate_objects(dg_shape))
                 if not shape_triples:
                     # Shape is not defined, validation fails
                     valid = False
                     if logger:
                         logger.warning(
-                            f"Data graph shape {dg_shape} is not defined in widget scoring graph"
+                            f"Data graph shape {dg_shape} is not defined in data graph shapes graph"
                         )
                     break
 
                 # For simple sh:datatype constraints, do direct comparison
 
-                shape_datatype = widget_scoring_graph.value(dg_shape, SH.datatype)
+                shape_datatype = data_graph_shapes_graph.value(dg_shape, SH.datatype)
 
                 # Check if we can use the simple datatype limit optimization
                 # Pass if the only constraint is sh:datatype
@@ -164,7 +176,7 @@ def score_widgets(
             else:
                 # For URIRef/BNode, validate directly
                 if not validate_node_against_shape(
-                    value_node, dg_shape, data_graph, widget_scoring_graph, logger
+                    value_node, dg_shape, data_graph, data_graph_shapes_graph, logger
                 ):
                     valid = False
                     break
@@ -172,42 +184,40 @@ def score_widgets(
         # Validate against shapesGraphShapes
         if valid:
             for sg_shape in score_inst["shapesGraphShapes"]:
-                # If no constraint_shape provided, this score is not applicable
-                if constraint_shape is None:
-                    valid = False
-                    if logger:
-                        logger.debug(
-                            f"Score {score_inst['uri']} requires constraint_shape but none provided"
-                        )
-                    break
-
-                # Validate the constraint shape against the shapes graph shape
-                if not validate_node_against_shape(
-                    constraint_shape,
-                    sg_shape,
-                    shapes_graph,
-                    widget_scoring_graph,
-                    logger,
-                ):
-                    valid = False
-                    break
+                # If constraint_shape is provided, use it as the focus node (target)
+                # If not provided, validate using the shape's own declared targets
+                if constraint_shape is not None:
+                    # Validate the constraint shape as a focus node
+                    if not validate_node_against_shape(
+                        constraint_shape,
+                        sg_shape,
+                        shapes_graph,
+                        shapes_graph_shapes_graph,
+                        logger,
+                    ):
+                        valid = False
+                        break
+                else:
+                    # No constraint_shape provided, validate using shape's own targets
+                    # If shapes_graph is None, create an empty graph for validation
+                    graph_to_validate = shapes_graph if shapes_graph is not None else Graph()
+                    if not validate_graph_against_shape(
+                        graph_to_validate,
+                        sg_shape,
+                        shapes_graph_shapes_graph,
+                        logger,
+                    ):
+                        valid = False
+                        break
 
         # If all validations passed (or no shapes to validate), record the result
         if valid:
             results.append((score_inst["widget"], score_inst["score"]))
 
-    # Step e: Aggregate Multiple Scores per Widget
-    # When multiple Score instances reference the same widget, keep the maximum score
-    widget_max_scores = {}
-    for widget, score in results:
-        if widget not in widget_max_scores or score > widget_max_scores[widget]:
-            widget_max_scores[widget] = score
-
-    # Step f: Sort and Return
-    # Create WidgetScore objects and sort
-    # WidgetScore.__lt__ handles sorting: score descending, then widget IRI ascending
+    # Step e: Create WidgetScore objects (NO deduplication)
+    # All matching score instances should be returned, even if same widget
     widget_scores = [
-        WidgetScore(widget=w, score=s) for w, s in widget_max_scores.items()
+        WidgetScore(widget=w, score=s) for w, s in results
     ]
     widget_scores.sort()  # Uses WidgetScore.__lt__
 

@@ -27,7 +27,11 @@ The keywords **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **S
   <dt>Shapes Graph</dt>
   <dd>The RDF graph containing the SHACL shapes that constrain the Data Graph.</dd>
   <dt>Widget Scoring Graph</dt>
-  <dd>An RDF graph containing <code>shui:Score</code> instances that define the mapping rules.</dd>
+  <dd>An RDF graph containing <code>shui:Score</code> instances that define the widget scoring rules.</dd>
+  <dt>Data Graph Shapes Graph</dt>
+  <dd>An RDF graph containing SHACL shapes referenced by <code>shui:dataGraphShape</code> properties. These shapes validate value nodes in the Data Graph during widget scoring.</dd>
+  <dt>Shapes Graph Shapes Graph</dt>
+  <dd>An RDF graph containing SHACL shapes referenced by <code>shui:shapesGraphShape</code> properties. These shapes validate constraint shapes in the Shapes Graph during widget scoring.</dd>
   <dt>Value Node</dt>
   <dd>A node in the Data Graph being validated. In SHACL, a value node can also serve as a focus node for validation purposes.</dd>
   <dt>Constraint Shape</dt>
@@ -74,7 +78,7 @@ Score comparisons SHOULD use the precision provided in the RDF literal. Implemen
 *   **Range**: `sh:Shape`
 *   **Multiplicity**: Zero or more.
 
-Links to a SHACL shape that validates the **Value Node** in the **Data Graph**. If the Value Node conforms to this shape, the condition is satisfied.
+Links to a SHACL shape defined in the **Data Graph Shapes Graph** that validates the **Value Node** in the **Data Graph**. If the Value Node conforms to this shape, the condition is satisfied.
 
 #### 3.3.4. shui:shapesGraphShape
 
@@ -82,7 +86,7 @@ Links to a SHACL shape that validates the **Value Node** in the **Data Graph**. 
 *   **Range**: `sh:Shape`
 *   **Multiplicity**: Zero or more.
 
-Links to a SHACL shape that validates the **Constraint Shape** in the **Shapes Graph**. This allows scoring based on the definition of the shape itself (e.g., "does the shape have a `sh:datatype` constraint?").
+Links to a SHACL shape defined in the **Shapes Graph Shapes Graph** that validates the **Constraint Shape** in the **Shapes Graph**. This allows scoring based on the definition of the shape itself (e.g., "does the shape have a `sh:datatype` constraint?").
 
 ### 3.4. SHACL Feature Support
 
@@ -94,8 +98,12 @@ Recursive or circular shape references are handled according to the SHACL valida
 
 The input to the scoring algorithm is:
 1.  **Value Node**: The node in the Data Graph being validated.
-2.  **Constraint Shape** (Optional): The shape node in the Shapes Graph that constrains the Value Node.
-3.  **Widget Scoring Graph**: The graph containing `shui:Score` instances.
+2.  **Data Graph** (Optional): The graph containing the Value Node.
+3.  **Constraint Shape** (Optional): The shape node in the Shapes Graph that constrains the Value Node.
+4.  **Shapes Graph** (Optional): The graph containing the Constraint Shape.
+5.  **Widget Scoring Graph**: The graph containing `shui:Score` instances.
+6.  **Data Graph Shapes Graph**: The graph containing shapes referenced by `shui:dataGraphShape`.
+7.  **Shapes Graph Shapes Graph**: The graph containing shapes referenced by `shui:shapesGraphShape`.
 
 The output is a list of widgets with their calculated scores.
 
@@ -113,15 +121,15 @@ The Value Node MUST exist in the Data Graph. If the Value Node is undefined or m
 2.  For each instance `S` of type `shui:Score` in the Widget Scoring Graph:
     a.  Initialize `valid` = true
     b.  For each value `DGS` of `S.shui:dataGraphShape`:
-        i.  Validate the **Value Node** against the SHACL shape `DGS`
+        i.  Validate the **Value Node** (as focus node) against the SHACL shape `DGS` (from **Data Graph Shapes Graph**) using the **Data Graph** as the data graph
         ii. If validation produces violations, set `valid` = false and break
     c.  For each value `SGS` of `S.shui:shapesGraphShape`:
-        i.  Validate the **Constraint Shape** (as the focus node) against the SHACL shape `SGS` (using the Shapes Graph as data)
+        i.  Validate the **Constraint Shape** (as focus node) against the SHACL shape `SGS` (from **Shapes Graph Shapes Graph**) using the **Shapes Graph** as the data graph
         ii. If validation produces violations, set `valid` = false and break
     d.  If `valid` is true (including when S has zero shape constraints), record `(S.shui:widget, S.shui:score)` in `Results`
 3.  Return `Results` sorted by score in descending order. When scores are equal, widgets SHOULD be sorted lexicographically by widget IRI for deterministic ordering.
 
-**Note:** A Score is valid if no linked shapes produce violations. An S may have zero or more `dataGraphShape` or `shapesGraphShape` values. The widget with the highest score is the default widget selection. If multiple `shui:Score` instances reference the same widget, the maximum score for that widget determines its position in the sorted results. Implementations MUST return the highest-scoring widget as the default, but MAY also provide other widgets with valid scores (including zero or negative) as alternative options.
+**Note:** A Score is valid if no linked shapes produce violations. An S may have zero or more `dataGraphShape` or `shapesGraphShape` values. The widget with the highest score is the default widget selection. If multiple `shui:Score` instances reference the same widget, ALL matching score instances are returned in `Results`. The implementation determines the default widget by selecting the widget with the highest score overall, but multiple score instances for the same widget may exist in the results.
 
 ### 4.1. Error Handling
 
@@ -220,7 +228,7 @@ Zero-scored widgets appear in results but are not selectable for use.
 
 ### 6.4. Multiple Scores for Same Widget
 
-When multiple Score instances reference the same widget, the maximum score determines precedence:
+When multiple Score instances reference the same widget, ALL matching scores are returned in `Results`:
 
 ```turtle
 # Score 10 if value is boolean
@@ -236,18 +244,4 @@ shui:booleanScore5 a shui:Score ;
     shui:score 5 .
 ```
 
-If both conditions are met, `BooleanSelectEditor` appears with both scores in `Results`, but the implementation uses the maximum (10) for determining the default widget.
-
-### 6.5. Missing Constraint Shape with shapesGraphShape
-
-If a Score has `shapesGraphShape` values but no Constraint Shape is provided to the algorithm, the validation cannot be performed:
-
-```turtle
-# This score requires checking the constraint shape
-shui:datePickerForDateConstraint a shui:Score ;
-    shui:shapesGraphShape shui:hasDateDatatype ;
-    shui:widget shui:DatePickerEditor ;
-    shui:score 5 .
-```
-
-If the algorithm is invoked without a Constraint Shape, attempting to validate against `shapesGraphShape` will fail because there is no Constraint Shape node to validate. Implementations SHOULD handle this gracefully (e.g., treat as a validation failure, making the Score not applicable).
+If both conditions are met, `BooleanSelectEditor` appears with both scores (10 and 5) in `Results`. The implementation determines the default widget by selecting the widget with the highest score (10 in this case). The UI implementation may choose how to handle multiple score instances for the same widget (e.g., display all scores, aggregate them, or use only the maximum).

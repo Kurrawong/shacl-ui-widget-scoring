@@ -153,7 +153,7 @@ class TestEdgeCases(unittest.TestCase):
         self.assertEqual(result.default_score, Decimal("0"))
 
     def test_6_4_multiple_scores_same_widget(self):
-        """Test 6.4: Max score precedence for same widget"""
+        """Test 6.4: Multiple scores for same widget - all returned"""
         # Score 10 for WidgetA
         self.scoring_graph.add((EX.Score1, RDF.type, SHUI.Score))
         self.scoring_graph.add((EX.Score1, SHUI.widget, EX.WidgetA))
@@ -168,27 +168,14 @@ class TestEdgeCases(unittest.TestCase):
             value_node=Literal("foo"), widget_scoring_graph=self.scoring_graph
         )
 
-        self.assertEqual(len(result.widget_scores), 1)
+        # Both scores should be returned
+        self.assertEqual(len(result.widget_scores), 2)
+        self.assertEqual(result.widget_scores[0].score, Decimal("10"))
+        self.assertEqual(result.widget_scores[1].score, Decimal("5"))
+
+        # Default should be highest score
         self.assertEqual(result.default_widget, EX.WidgetA)
         self.assertEqual(result.default_score, Decimal("10"))
-
-    def test_6_5_missing_constraint_shape(self):
-        """Test 6.5: Score requiring shapesGraphShape fails if no constraint shape provided"""
-        self.scoring_graph.add((EX.ShapeScore, RDF.type, SHUI.Score))
-        self.scoring_graph.add((EX.ShapeScore, SHUI.widget, EX.ShapeWidget))
-        self.scoring_graph.add((EX.ShapeScore, SHUI.score, Literal(Decimal("5"))))
-        self.scoring_graph.add((EX.ShapeScore, SHUI.shapesGraphShape, EX.SomeShape))
-
-        # Define EX.SomeShape so it's valid RDF, even if empty
-        self.scoring_graph.add((EX.SomeShape, RDF.type, SH.NodeShape))
-
-        # Call WITHOUT constraint_shape
-        result = score_widgets(
-            value_node=Literal("foo"), widget_scoring_graph=self.scoring_graph
-        )
-
-        # Should be empty because the condition cannot be evaluated
-        self.assertEqual(len(result.widget_scores), 0)
 
     def test_complex_shacl_hasValue_constraint(self):
         """Test strict spec example correctness using sh:hasValue"""
