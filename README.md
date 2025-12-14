@@ -186,6 +186,20 @@ uv run pytest tests/test_core.py
 
 The library has 90% test coverage across 67 tests covering the core algorithm, validation, models, and specification compliance.
 
+## Interactive Playground
+
+An optional web-based playground is available to try the algorithm interactively in your browser. The playground is a Vue 3 application that packages the Python library as a wheel and executes it using [Pyodide](https://pyodide.org/), allowing you to test the scoring algorithm without installation.
+
+To run the playground:
+
+```bash
+cd playground
+npm install
+npm run dev
+```
+
+For more details, see [playground/README.md](playground/README.md).
+
 ## Error Handling
 
 The library raises specific exceptions for error conditions:

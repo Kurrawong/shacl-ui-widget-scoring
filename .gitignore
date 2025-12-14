@@ -8,3 +8,11 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Playground (Vue 3 web app)
+playground/node_modules/
+playground/dist/
+playground/dist-ssr/
+playground/.vscode/*
+playground/.DS_Store
+playground/*.log

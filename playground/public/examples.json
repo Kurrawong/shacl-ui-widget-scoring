@@ -1,0 +1,40 @@
+{
+  "version": "1.0.0",
+  "sharedGraphs": {
+    "widgetScoringGraph": "@prefix shui: <http://www.w3.org/ns/shacl-ui#> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nshui:booleanSelectEditorScore0-hasDatatype a shui:Score ;\n    shui:score 0 ;\n    shui:shapesGraphShape shui:hasDatatype ;\n    shui:widget shui:BooleanSelectEditor .\n\nshui:booleanSelectEditorScore0-hasNonLiteralNodeKind a shui:Score ;\n    shui:score 0 ;\n    shui:shapesGraphShape shui:hasNonLiteralNodeKind ;\n    shui:widget shui:BooleanSelectEditor .\n\nshui:booleanSelectEditorScore0-isNotLiteral a shui:Score ;\n    shui:dataGraphShape shui:isNotLiteral ;\n    shui:score 0 ;\n    shui:widget shui:BooleanSelectEditor .\n\nshui:booleanSelectEditorScore10 a shui:Score ;\n    shui:dataGraphShape shui:isBoolean ;\n    shui:score 10 ;\n    shui:widget shui:BooleanSelectEditor .\n\nshui:booleanSelectEditorScoreNull a shui:Score ;\n    shui:score -1 ;\n    shui:shapesGraphShape shui:literalNoDatatypeSpecified ;\n    shui:widget shui:BooleanSelectEditor .\n\nshui:datePickerEditorScore10 a shui:Score ;\n    shui:dataGraphShape shui:isDate ;\n    shui:score 10 ;\n    shui:widget shui:DatePickerEditor .\n\nshui:datePickerEditorScore5 a shui:Score ;\n    shui:score 5 ;\n    shui:shapesGraphShape shui:hasDateDatatype ;\n    shui:widget shui:DatePickerEditor .\n\n",
+    "dataGraphShapes": "@prefix sh: <http://www.w3.org/ns/shacl#> .\n@prefix shui: <http://www.w3.org/ns/shacl-ui#> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nshui:isBoolean a sh:NodeShape ;\n    sh:datatype xsd:boolean .\n\nshui:isDate a sh:NodeShape ;\n    sh:datatype xsd:date .\n\nshui:isNotLiteral a sh:NodeShape ;\n    sh:nodeKind sh:BlankNodeOrIRI .\n\n",
+    "shapesGraphShapes": "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n@prefix sh: <http://www.w3.org/ns/shacl#> .\n@prefix shui: <http://www.w3.org/ns/shacl-ui#> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nshui:hasDatatype a sh:NodeShape ;\n    sh:property [ sh:minCount 1 ;\n            sh:path sh:datatype ] .\n\nshui:hasDateDatatype a sh:NodeShape ;\n    sh:property [ sh:in ( xsd:date ) ;\n            sh:path sh:datatype ] .\n\nshui:hasNonLiteralNodeKind a sh:NodeShape ;\n    sh:property [ sh:in ( sh:BlankNodeOrIRI sh:IRI sh:BlankNode ) ;\n            sh:path sh:nodeKind ] .\n\nshui:literalNoDatatypeSpecified a sh:NodeShape ;\n    sh:property [ sh:hasValue sh:Literal ;\n            sh:path sh:nodeKind ],\n        [ sh:maxCount 0 ;\n            sh:path sh:datatype ] .\n\n"
+  },
+  "examples": [
+    {
+      "id": "example1",
+      "name": "Data Graph Only",
+      "description": "Widget scoring based only on data graph value node",
+      "dataGraph": "@prefix ex: <https://example.com/> .\n@prefix schema: <https://schema.org/> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nex:user-a a schema:Person ;\n    ex:isAdmin true .\n\n",
+      "valueNode": "true",
+      "valueNodeDatatype": "http://www.w3.org/2001/XMLSchema#boolean",
+      "shapesGraph": null,
+      "constraintShape": null
+    },
+    {
+      "id": "example2",
+      "name": "Data Graph + Shapes Graph (Non-literal Constraint)",
+      "description": "Widget scoring with shapes graph constraint requiring non-literal values",
+      "dataGraph": "@prefix ex: <https://example.com/> .\n@prefix schema: <https://schema.org/> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nex:user-a a schema:Person ;\n    ex:isAdmin true .\n\n",
+      "valueNode": "true",
+      "valueNodeDatatype": "http://www.w3.org/2001/XMLSchema#boolean",
+      "shapesGraph": "@prefix ex: <https://example.com/> .\n@prefix sh: <http://www.w3.org/ns/shacl#> .\n\nex:PersonIsAdminShape a sh:PropertyShape ;\n    sh:nodeKind sh:BlankNodeOrIRI ;\n    sh:path ex:isAdmin .\n\n",
+      "constraintShape": "https://example.com/PersonIsAdminShape"
+    },
+    {
+      "id": "example3",
+      "name": "Data Graph + Shapes Graph (Date Constraint)",
+      "description": "Widget scoring with shapes graph constraint requiring date datatype",
+      "dataGraph": "@prefix ex: <https://example.com/> .\n@prefix schema: <https://schema.org/> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nex:user-a a schema:Person ;\n    ex:isAdmin true .\n\n",
+      "valueNode": "true",
+      "valueNodeDatatype": "http://www.w3.org/2001/XMLSchema#boolean",
+      "shapesGraph": "@prefix ex: <https://example.com/> .\n@prefix sh: <http://www.w3.org/ns/shacl#> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nex:PersonIsAdminShape a sh:PropertyShape ;\n    sh:datatype xsd:date ;\n    sh:path ex:isAdmin .\n\n",
+      "constraintShape": "https://example.com/PersonIsAdminShape"
+    }
+  ]
+}

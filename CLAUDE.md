@@ -192,6 +192,12 @@ To build a distribution:
 uv build
 ```
 
+## Interactive Playground
+
+The `playground/` directory contains a Vue 3 web application that provides an interactive browser-based interface for the SHACL UI widget scoring algorithm. It packages the Python library as a wheel and executes it using Pyodide, enabling demonstration and testing without local installation.
+
+For playground-specific development instructions, build configuration, and deployment information, see [playground/README.md](playground/README.md).
+
 ## Claude Code Planning Rules
 
 When working on implementation tasks, follow these planning guidelines:
