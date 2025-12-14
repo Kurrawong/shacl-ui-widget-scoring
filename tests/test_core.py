@@ -8,7 +8,7 @@ from rdflib.namespace import RDF, XSD
 
 from shui_widget_scoring import score_widgets
 from shui_widget_scoring.exceptions import (
-    InvalidValueNodeError,
+    InvalidFocusNodeError,
     MissingGraphError,
     MalformedScoreError,
 )
@@ -34,7 +34,7 @@ class TestScoreWidgetsBasic:
         simple_widget_scoring_graph.add((EX.BooleanShape, SH.datatype, XSD.boolean))
 
         result = score_widgets(
-            value_node=Literal(True),
+            focus_node=Literal(True),
             widget_scoring_graph=simple_widget_scoring_graph,
             logger=logger,
         )
@@ -57,7 +57,7 @@ class TestScoreWidgetsBasic:
         scoring_graph.add((EX.DateShape, SH.datatype, XSD.date))
 
         result = score_widgets(
-            value_node=Literal(True),  # Boolean, doesn't match date shape
+            focus_node=Literal(True),  # Boolean, doesn't match date shape
             widget_scoring_graph=scoring_graph,
             logger=logger,
         )
@@ -86,7 +86,7 @@ class TestScoreWidgetsBasic:
         scoring_graph.add((EX.Score3, SHUI.score, Literal(Decimal("5"))))
 
         result = score_widgets(
-            value_node=Literal("test"),
+            focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
             logger=logger,
         )
@@ -125,7 +125,7 @@ class TestScoreWidgetsBasic:
         scoring_graph.add((EX.ScoreM, SHUI.score, Literal(Decimal("10"))))
 
         result = score_widgets(
-            value_node=Literal("test"),
+            focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
             logger=logger,
         )
@@ -139,28 +139,28 @@ class TestScoreWidgetsBasic:
 class TestScoreWidgetsInputValidation:
     """Tests for input validation in score_widgets."""
 
-    def test_invalid_value_node_type(self, simple_widget_scoring_graph):
-        """Test that invalid value_node type raises InvalidValueNodeError."""
-        with pytest.raises(InvalidValueNodeError):
+    def test_invalid_focus_node_type(self, simple_widget_scoring_graph):
+        """Test that invalid focus_node type raises InvalidFocusNodeError."""
+        with pytest.raises(InvalidFocusNodeError):
             score_widgets(
-                value_node="not a valid node",
+                focus_node="not a valid node",
                 widget_scoring_graph=simple_widget_scoring_graph,
             )
 
-    def test_uriref_value_node_requires_data_graph(self, simple_widget_scoring_graph):
-        """Test that URIRef value_node requires data_graph."""
+    def test_uriref_focus_node_requires_data_graph(self, simple_widget_scoring_graph):
+        """Test that URIRef focus_node requires data_graph."""
         with pytest.raises(MissingGraphError) as exc_info:
             score_widgets(
-                value_node=EX.someNode, widget_scoring_graph=simple_widget_scoring_graph
+                focus_node=EX.someNode, widget_scoring_graph=simple_widget_scoring_graph
             )
 
         assert "data_graph" in str(exc_info.value)
 
-    def test_bnode_value_node_requires_data_graph(self, simple_widget_scoring_graph):
-        """Test that BNode value_node requires data_graph."""
+    def test_bnode_focus_node_requires_data_graph(self, simple_widget_scoring_graph):
+        """Test that BNode focus_node requires data_graph."""
         with pytest.raises(MissingGraphError) as exc_info:
             score_widgets(
-                value_node=BNode(), widget_scoring_graph=simple_widget_scoring_graph
+                focus_node=BNode(), widget_scoring_graph=simple_widget_scoring_graph
             )
 
         assert "data_graph" in str(exc_info.value)
@@ -169,7 +169,7 @@ class TestScoreWidgetsInputValidation:
         """Test that constraint_shape requires shapes_graph."""
         with pytest.raises(MissingGraphError) as exc_info:
             score_widgets(
-                value_node=Literal("test"),
+                focus_node=Literal("test"),
                 widget_scoring_graph=simple_widget_scoring_graph,
                 constraint_shape=EX.SomeShape,
             )
@@ -182,7 +182,7 @@ class TestScoreWidgetsInputValidation:
         """Test that malformed widget scoring graph raises MalformedScoreError."""
         with pytest.raises(MalformedScoreError):
             score_widgets(
-                value_node=Literal("test"),
+                focus_node=Literal("test"),
                 widget_scoring_graph=malformed_scoring_graph_no_widget,
             )
 
@@ -213,7 +213,7 @@ class TestScoreWidgetsWithConstraintShapes:
         scoring_graph.add((prop, SH.minCount, Literal(1)))
 
         result = score_widgets(
-            value_node=Literal("test"),
+            focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
             constraint_shape=EX.PropertyShape,
             shapes_graph=shapes_graph,
@@ -235,7 +235,7 @@ class TestScoreWidgetsWithConstraintShapes:
         scoring_graph.add((EX.SomeShape, RDF.type, SH.NodeShape))
 
         result = score_widgets(
-            value_node=Literal("test"),
+            focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
             logger=logger,
         )
@@ -249,7 +249,7 @@ class TestScoreWidgetsWithConstraintShapes:
 class TestScoreWidgetsDataGraphValidation:
     """Tests for data graph validation in score_widgets."""
 
-    def test_score_with_uriref_value_node(self, logger):
+    def test_score_with_uriref_focus_node(self, logger):
         """Test scoring with URIRef value node."""
         # Create data graph
         data_graph = Graph()
@@ -267,7 +267,7 @@ class TestScoreWidgetsDataGraphValidation:
         scoring_graph.add((EX.PersonShape, SH["class"], EX.Person))
 
         result = score_widgets(
-            value_node=EX.item1,
+            focus_node=EX.item1,
             widget_scoring_graph=scoring_graph,
             data_graph=data_graph,
             logger=logger,

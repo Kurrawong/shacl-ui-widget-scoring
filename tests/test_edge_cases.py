@@ -24,7 +24,7 @@ class TestEmptyScoreConditions:
         scoring_graph.add((EX.DefaultScore, SHUI.score, Literal(Decimal("1"))))
 
         result = score_widgets(
-            value_node=Literal("any value"),
+            focus_node=Literal("any value"),
             widget_scoring_graph=scoring_graph,
             logger=logger,
         )
@@ -68,7 +68,7 @@ class TestNegativeScores:
         scoring_graph.add((EX.NegativeScore, SHUI.score, Literal(Decimal("-5"))))
 
         result = score_widgets(
-            value_node=Literal("test"),
+            focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
             logger=logger,
         )
@@ -96,7 +96,7 @@ class TestNegativeScores:
         scoring_graph.add((EX.Score3, SHUI.score, Literal(Decimal("-5"))))
 
         result = score_widgets(
-            value_node=Literal("test"),
+            focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
             logger=logger,
         )
@@ -119,7 +119,7 @@ class TestNegativeScores:
         scoring_graph.add((EX.Score2, SHUI.score, Literal(Decimal("-2"))))
 
         result = score_widgets(
-            value_node=Literal("test"),
+            focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
             logger=logger,
         )
@@ -140,7 +140,7 @@ class TestZeroScores:
         scoring_graph.add((EX.ZeroScore, SHUI.score, Literal(Decimal("0"))))
 
         result = score_widgets(
-            value_node=Literal("test"),
+            focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
             logger=logger,
         )
@@ -157,7 +157,7 @@ class TestZeroScores:
         scoring_graph.add((EX.ZeroScore, SHUI.score, Literal(Decimal("0"))))
 
         result = score_widgets(
-            value_node=Literal("test"),
+            focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
             logger=logger,
         )
@@ -194,7 +194,7 @@ class TestMultipleScoresPerWidget:
         scoring_graph.add((EX.Score3, SHUI.score, Literal(Decimal("2"))))
 
         result = score_widgets(
-            value_node=Literal("test"),
+            focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
             logger=logger,
         )
@@ -239,7 +239,7 @@ class TestMultipleScoresPerWidget:
 
         # Test with boolean value - both scores should match, both returned
         result = score_widgets(
-            value_node=Literal(True), widget_scoring_graph=scoring_graph, logger=logger
+            focus_node=Literal(True), widget_scoring_graph=scoring_graph, logger=logger
         )
 
         # Both scores should be returned
@@ -254,7 +254,7 @@ class TestMultipleScoresPerWidget:
 class TestLiteralVsNodeValueNodes:
     """Test handling of Literal vs URIRef/BNode value nodes."""
 
-    def test_literal_value_node_no_data_graph_needed(self, logger):
+    def test_literal_focus_node_no_data_graph_needed(self, logger):
         """Test that Literal value nodes don't require data_graph."""
         scoring_graph = Graph()
 
@@ -264,7 +264,7 @@ class TestLiteralVsNodeValueNodes:
 
         # Should work without data_graph for Literal
         result = score_widgets(
-            value_node=Literal("test"),
+            focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
             logger=logger,
         )
@@ -272,7 +272,7 @@ class TestLiteralVsNodeValueNodes:
         assert len(result.widget_scores) == 1
         assert result.default_widget == EX.TextWidget
 
-    def test_uriref_value_node_requires_data_graph(self, logger):
+    def test_uriref_focus_node_requires_data_graph(self, logger):
         """Test that URIRef value nodes require data_graph."""
         from shui_widget_scoring.exceptions import MissingGraphError
         import pytest
@@ -286,12 +286,12 @@ class TestLiteralVsNodeValueNodes:
         # Should raise MissingGraphError without data_graph
         with pytest.raises(MissingGraphError):
             score_widgets(
-                value_node=EX.someNode,
+                focus_node=EX.someNode,
                 widget_scoring_graph=scoring_graph,
                 logger=logger,
             )
 
-    def test_uriref_value_node_with_data_graph(self, logger):
+    def test_uriref_focus_node_with_data_graph(self, logger):
         """Test that URIRef value nodes work with data_graph."""
         data_graph = Graph()
         data_graph.add((EX.item1, RDF.type, EX.Thing))
@@ -304,7 +304,7 @@ class TestLiteralVsNodeValueNodes:
 
         # Should work with data_graph
         result = score_widgets(
-            value_node=EX.item1,
+            focus_node=EX.item1,
             widget_scoring_graph=scoring_graph,
             data_graph=data_graph,
             logger=logger,
@@ -332,7 +332,7 @@ class TestDecimalPrecision:
         scoring_graph.add((EX.Score2, SHUI.score, Literal(Decimal("10.2"))))
 
         result = score_widgets(
-            value_node=Literal("test"),
+            focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
             logger=logger,
         )

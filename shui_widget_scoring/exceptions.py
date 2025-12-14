@@ -15,8 +15,8 @@ class MalformedScoreError(ShuiWidgetScoringError):
         super().__init__(f"Malformed Score instance {score_uri}: {message}")
 
 
-class InvalidValueNodeError(ShuiWidgetScoringError):
-    """Raised when the value node is invalid or missing from data graph."""
+class InvalidFocusNodeError(ShuiWidgetScoringError):
+    """Raised when the focus node is invalid or missing."""
 
     pass
 

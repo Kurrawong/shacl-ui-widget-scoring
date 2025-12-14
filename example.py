@@ -244,16 +244,16 @@ def format_results_as_json(
     return json.dumps(output_dict, indent=2)
 
 
-def format_value_node(value_node) -> str:
-    """Format a value node for display."""
-    if isinstance(value_node, Literal):
-        datatype = value_node.datatype
+def format_focus_node(focus_node) -> str:
+    """Format a focus node for display."""
+    if isinstance(focus_node, Literal):
+        datatype = focus_node.datatype
         if datatype:
             datatype_str = str(datatype).split("/")[-1]
-            return f"{value_node} ({datatype_str})"
+            return f"{focus_node} ({datatype_str})"
         else:
-            return str(value_node)
-    return str(value_node)
+            return str(focus_node)
+    return str(focus_node)
 
 
 def run_example_1(
@@ -267,8 +267,8 @@ def run_example_1(
     # Create data graph
     data_graph = create_data_graph()
 
-    # Value node to score
-    value_node = Literal(True)
+    # Focus node to score
+    focus_node = Literal(True)
 
     print("\nData Graph:")
     print("-" * 80)
@@ -288,7 +288,7 @@ def run_example_1(
 
     # Score the widgets
     result = score_widgets(
-        value_node=value_node,
+        focus_node=focus_node,
         widget_scoring_graph=scoring_graph,
         data_graph_shapes_graph=data_graph_shapes,
         shapes_graph_shapes_graph=shapes_graph_shapes,
@@ -296,7 +296,7 @@ def run_example_1(
 
     print("\nScoring Results:")
     print("-" * 80)
-    print(f"Value Node: {format_value_node(value_node)}\n")
+    print(f"Focus Node: {format_focus_node(focus_node)}\n")
     print("Matched Scores (JSON):")
     print(format_results_as_json(result, scoring_graph))
 
@@ -317,8 +317,8 @@ def run_example_2(
     data_graph = create_data_graph()
     shapes_graph = create_shapes_graph_example2()
 
-    # Value node to score
-    value_node = Literal(True)
+    # Focus node to score
+    focus_node = Literal(True)
 
     # Get constraint shape
     constraint_shape = EX.PersonIsAdminShape
@@ -345,7 +345,7 @@ def run_example_2(
 
     # Score the widgets
     result = score_widgets(
-        value_node=value_node,
+        focus_node=focus_node,
         widget_scoring_graph=scoring_graph,
         constraint_shape=constraint_shape,
         shapes_graph=shapes_graph,
@@ -355,7 +355,7 @@ def run_example_2(
 
     print("\nScoring Results:")
     print("-" * 80)
-    print(f"Value Node: {format_value_node(value_node)}")
+    print(f"Focus Node: {format_focus_node(focus_node)}")
     print(f"Constraint Shape: {constraint_shape}\n")
     print("Matched Scores (JSON):")
     print(format_results_as_json(result, scoring_graph))
@@ -377,8 +377,8 @@ def run_example_3(
     data_graph = create_data_graph()
     shapes_graph = create_shapes_graph_example3()
 
-    # Value node to score
-    value_node = Literal(True)
+    # Focus node to score
+    focus_node = Literal(True)
 
     # Get constraint shape
     constraint_shape = EX.PersonIsAdminShape
@@ -405,7 +405,7 @@ def run_example_3(
 
     # Score the widgets
     result = score_widgets(
-        value_node=value_node,
+        focus_node=focus_node,
         widget_scoring_graph=scoring_graph,
         constraint_shape=constraint_shape,
         shapes_graph=shapes_graph,
@@ -415,7 +415,7 @@ def run_example_3(
 
     print("\nScoring Results:")
     print("-" * 80)
-    print(f"Value Node: {format_value_node(value_node)}")
+    print(f"Focus Node: {format_focus_node(focus_node)}")
     print(f"Constraint Shape: {constraint_shape}\n")
     print("Matched Scores (JSON):")
     print(format_results_as_json(result, scoring_graph))

@@ -10,7 +10,7 @@ from .models import WidgetScore, ScoringResult
 from .exceptions import (
     ShuiWidgetScoringError,
     MalformedScoreError,
-    InvalidValueNodeError,
+    InvalidFocusNodeError,
     MissingGraphError,
 )
 from .namespaces import SHUI, SH
@@ -22,7 +22,7 @@ __all__ = [
     "ScoringResult",
     "ShuiWidgetScoringError",
     "MalformedScoreError",
-    "InvalidValueNodeError",
+    "InvalidFocusNodeError",
     "MissingGraphError",
     "SHUI",
     "SH",

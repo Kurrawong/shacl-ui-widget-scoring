@@ -58,6 +58,102 @@ def _get_meta_shapes_graph() -> Graph:
     return g
 
 
+def _node_exists_in_graph(node: Union[URIRef, BNode, Literal], graph: Graph) -> bool:
+    """
+    Check if a node appears in any triple position in the graph.
+
+    A node exists if it appears:
+    - As a subject (URIRef, BNode, or Literal)
+    - As a predicate (URIRef or BNode only)
+    - As an object (URIRef, BNode, or Literal)
+
+    Args:
+        node: The node to check (URIRef, BNode, or Literal)
+        graph: The graph to search
+
+    Returns:
+        True if the node exists in any position, False otherwise
+    """
+    # Check as subject
+    if isinstance(node, (URIRef, BNode)):
+        if (node, None, None) in graph:
+            return True
+    else:  # Literal
+        # Literals are never subjects
+        pass
+
+    # Check as predicate (only URIRef or BNode)
+    if isinstance(node, (URIRef, BNode)):
+        if (None, node, None) in graph:
+            return True
+
+    # Check as object
+    if (None, None, node) in graph:
+        return True
+
+    return False
+
+
+def validate_against_shapes(
+    focus_node: Union[URIRef, BNode, Literal],
+    target_graph: Graph,
+    shapes: List[Union[URIRef, BNode]],
+    shapes_graph: Graph,
+    logger: Optional[logging.Logger] = None,
+) -> bool:
+    """
+    Validate a focus node against a list of SHACL shapes (symmetric validation logic).
+
+    Implements the ValidateAgainstShapes() function from spec section 4.1.
+
+    Args:
+        focus_node: The node to validate (serves as the SHACL focus node)
+        target_graph: The RDF graph containing the focus node
+        shapes: List of SHACL shape IRIs to validate against (empty list is valid)
+        shapes_graph: The RDF graph containing the shape definitions
+        logger: Optional logger for warnings
+
+    Returns:
+        True if all validations pass, False otherwise
+
+    Logic:
+        1. If shapes is empty, return True
+        2. For each shape:
+           a. If focus_node does not exist in target_graph, return False (unless it's a Literal in an empty graph)
+           b. Validate focus_node against shape using target_graph as data graph
+           c. If validation produces violations, return False
+        3. Return True
+    """
+    # Step 1: If shapes list is empty, return True
+    if not shapes:
+        return True
+
+    # For each shape, validate the focus node
+    for shape in shapes:
+        # Check if shape is defined in shapes_graph (must have at least one predicate)
+        shape_triples = list(shapes_graph.predicate_objects(shape))
+        if not shape_triples:
+            # Shape is not defined, validation fails
+            if logger:
+                logger.warning(f"Shape {shape} is not defined in shapes graph")
+            return False
+
+        # Step 2a: Check if focus_node exists in target_graph
+        # Special case: Allow Literals in empty graphs (they may be validated using temporary graphs)
+        if not (isinstance(focus_node, Literal) and len(target_graph) == 0):
+            if not _node_exists_in_graph(focus_node, target_graph):
+                return False
+
+        # Step 2b & 2c: Validate focus_node against shape
+        if not validate_node_against_shape(
+            focus_node, shape, target_graph, shapes_graph, logger
+        ):
+            return False
+
+    # Step 3: All validations passed
+    return True
+
+
 def validate_widget_scoring_graph(
     widget_scoring_graph: Graph, logger: Optional[logging.Logger] = None
 ) -> None:

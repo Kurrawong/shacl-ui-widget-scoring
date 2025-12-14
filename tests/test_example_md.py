@@ -145,10 +145,10 @@ class TestExampleMd:
         This includes scores with shui:hasDatatype, shui:hasDateDatatype,
         shui:literalNoDatatypeSpecified, and shui:hasNonLiteralNodeKind.
         """
-        value_node = Literal(True)
+        focus_node = Literal(True)
 
         result = score_widgets(
-            value_node=value_node,
+            focus_node=focus_node,
             widget_scoring_graph=widget_scoring_graph,
             data_graph_shapes_graph=data_graph_shapes,
             shapes_graph_shapes_graph=shapes_graph_shapes,
@@ -172,7 +172,7 @@ class TestExampleMd:
         self, widget_scoring_graph, data_graph_shapes, shapes_graph_shapes
     ):
         """Test Example 2: With shapes graph constraining to non-literal - should return scores 10 and 0."""
-        value_node = Literal(True)
+        focus_node = Literal(True)
 
         # Create shapes graph with non-literal constraint
         shapes_graph = Graph()
@@ -187,7 +187,7 @@ class TestExampleMd:
         shapes_graph.parse(data=turtle, format="turtle")
 
         result = score_widgets(
-            value_node=value_node,
+            focus_node=focus_node,
             widget_scoring_graph=widget_scoring_graph,
             constraint_shape=EX.PersonIsAdminShape,
             shapes_graph=shapes_graph,
@@ -211,7 +211,7 @@ class TestExampleMd:
         self, widget_scoring_graph, data_graph_shapes, shapes_graph_shapes
     ):
         """Test Example 3: With shapes graph constraining to date - should return BooleanSelectEditor (10) and DatePickerEditor (5)."""
-        value_node = Literal(True)
+        focus_node = Literal(True)
 
         # Create shapes graph with date constraint
         shapes_graph = Graph()
@@ -227,7 +227,7 @@ class TestExampleMd:
         shapes_graph.parse(data=turtle, format="turtle")
 
         result = score_widgets(
-            value_node=value_node,
+            focus_node=focus_node,
             widget_scoring_graph=widget_scoring_graph,
             constraint_shape=EX.PersonIsAdminShape,
             shapes_graph=shapes_graph,
