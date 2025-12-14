@@ -48,8 +48,8 @@ def extract_examples():
                 "name": "Data Graph Only",
                 "description": "Widget scoring based only on data graph value node",
                 "dataGraph": serialize_graph(create_data_graph()),
-                "valueNode": "true",  # Literal(True)
-                "valueNodeDatatype": "http://www.w3.org/2001/XMLSchema#boolean",
+                "focusNode": "true",  # Literal(True)
+                "focusNodeDatatype": "http://www.w3.org/2001/XMLSchema#boolean",
                 "shapesGraph": None,
                 "constraintShape": None,
             },
@@ -58,8 +58,8 @@ def extract_examples():
                 "name": "Data Graph + Shapes Graph (Non-literal Constraint)",
                 "description": "Widget scoring with shapes graph constraint requiring non-literal values",
                 "dataGraph": serialize_graph(create_data_graph()),
-                "valueNode": "true",  # Literal(True)
-                "valueNodeDatatype": "http://www.w3.org/2001/XMLSchema#boolean",
+                "focusNode": "true",  # Literal(True)
+                "focusNodeDatatype": "http://www.w3.org/2001/XMLSchema#boolean",
                 "shapesGraph": serialize_graph(create_shapes_graph_example2()),
                 "constraintShape": "https://example.com/PersonIsAdminShape",
             },
@@ -68,8 +68,8 @@ def extract_examples():
                 "name": "Data Graph + Shapes Graph (Date Constraint)",
                 "description": "Widget scoring with shapes graph constraint requiring date datatype",
                 "dataGraph": serialize_graph(create_data_graph()),
-                "valueNode": "true",  # Literal(True)
-                "valueNodeDatatype": "http://www.w3.org/2001/XMLSchema#boolean",
+                "focusNode": "true",  # Literal(True)
+                "focusNodeDatatype": "http://www.w3.org/2001/XMLSchema#boolean",
                 "shapesGraph": serialize_graph(create_shapes_graph_example3()),
                 "constraintShape": "https://example.com/PersonIsAdminShape",
             },

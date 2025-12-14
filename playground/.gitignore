@@ -1,3 +1,6 @@
+# Playground specific ignores
+pyodide/**/*.whl
+
 # Logs
 logs
 *.log

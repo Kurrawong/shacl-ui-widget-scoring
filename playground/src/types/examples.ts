@@ -7,8 +7,8 @@ export interface Example {
   name: string
   description: string
   dataGraph: string
-  valueNode: string
-  valueNodeDatatype: string
+  focusNode: string
+  focusNodeDatatype: string
   shapesGraph: string | null
   constraintShape: string | null
 }

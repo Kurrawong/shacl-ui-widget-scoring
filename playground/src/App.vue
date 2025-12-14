@@ -49,13 +49,13 @@ async function runScoring() {
   }, { immediate: true })
 
   try {
-    // Parse value node based on datatype
-    const valueNode = playgroundStore.valueNode
-    const valueNodeDatatype = playgroundStore.valueNodeDatatype
+    // Parse focus node based on datatype
+    const focusNode = playgroundStore.focusNode
+    const focusNodeDatatype = playgroundStore.focusNodeDatatype
 
     const result = await scoreWidgets({
-      valueNode,
-      valueNodeDatatype,
+      focusNode,
+      focusNodeDatatype,
       widgetScoringGraph: playgroundStore.widgetScoringGraph,
       dataGraphShapes: playgroundStore.dataGraphShapes,
       shapesGraphShapes: playgroundStore.shapesGraphShapes,

@@ -62,25 +62,25 @@ shapes_graph_shapes.parse(data="""${
     request.shapesGraphShapes
   }""", format="turtle")
 
-# Parse value node
-value_node_str = """${request.valueNode}"""
-value_node_datatype = """${request.valueNodeDatatype}"""
+# Parse focus node
+focus_node_str = """${request.focusNode}"""
+focus_node_datatype = """${request.focusNodeDatatype}"""
 
 # Create appropriate RDFLib node type based on datatype
-if value_node_datatype == "http://www.w3.org/2001/XMLSchema#boolean":
-    value_node = Literal(value_node_str.lower() == 'true', datatype=URIRef(value_node_datatype))
-elif value_node_datatype == "http://www.w3.org/2001/XMLSchema#integer":
-    value_node = Literal(int(value_node_str), datatype=URIRef(value_node_datatype))
-elif value_node_datatype == "http://www.w3.org/2001/XMLSchema#decimal":
-    value_node = Literal(float(value_node_str), datatype=URIRef(value_node_datatype))
-elif value_node_datatype == "http://www.w3.org/2001/XMLSchema#date":
-    value_node = Literal(value_node_str, datatype=URIRef(value_node_datatype))
+if focus_node_datatype == "http://www.w3.org/2001/XMLSchema#boolean":
+    focus_node = Literal(focus_node_str.lower() == 'true', datatype=URIRef(focus_node_datatype))
+elif focus_node_datatype == "http://www.w3.org/2001/XMLSchema#integer":
+    focus_node = Literal(int(focus_node_str), datatype=URIRef(focus_node_datatype))
+elif focus_node_datatype == "http://www.w3.org/2001/XMLSchema#decimal":
+    focus_node = Literal(float(focus_node_str), datatype=URIRef(focus_node_datatype))
+elif focus_node_datatype == "http://www.w3.org/2001/XMLSchema#date":
+    focus_node = Literal(focus_node_str, datatype=URIRef(focus_node_datatype))
 else:
-    value_node = Literal(value_node_str, datatype=URIRef(value_node_datatype))
+    focus_node = Literal(focus_node_str, datatype=URIRef(focus_node_datatype))
 
 # Prepare kwargs
 kwargs = {
-    'value_node': value_node,
+    'focus_node': focus_node,
     'widget_scoring_graph': widget_scoring_graph,
     'data_graph_shapes_graph': data_graph_shapes,
     'shapes_graph_shapes_graph': shapes_graph_shapes,
@@ -163,7 +163,7 @@ output = {
     'defaultWidget': str(result.default_widget) if result.default_widget else None,
     'defaultScore': int(result.default_score) if result.default_score else None,
     'executionSteps': [],
-    'valueNode': value_node_str,
+    'focusNode': focus_node_str,
     'constraintShape': """${request.constraintShape || ""}""" or None,
 }
 

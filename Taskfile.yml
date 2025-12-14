@@ -1,9 +1,11 @@
 # https://taskfile.dev
 
-version: '3'
+version: "3"
 
-vars:
-  GREETING: Hello, World!
+includes:
+  play:
+    dir: ./playground
+    taskfile: ./playground/Taskfile.yml
 
 tasks:
   default:
@@ -16,3 +18,20 @@ tasks:
     cmds:
       - uv run ruff format .
       - uv run ruff check --fix .
+
+  test:
+    desc: Run Python tests with pytest
+    cmds:
+      - uv run pytest
+
+  build:
+    desc: Build the Python library wheel
+    cmds:
+      - uv build
+
+  build-and-copy:
+    desc: Build the Python library and copy wheel to playground/pyodide/
+    cmds:
+      - task: build
+      - mkdir -p playground/pyodide
+      - cp dist/*.whl playground/pyodide/

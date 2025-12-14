@@ -9,8 +9,8 @@ export const usePlaygroundStore = defineStore('playground', () => {
   const shapesGraphShapes = ref<string>('')
   const dataGraph = ref<string>('')
   const shapesGraph = ref<string>('')
-  const valueNode = ref<string>('true')
-  const valueNodeDatatype = ref<string>('http://www.w3.org/2001/XMLSchema#boolean')
+  const focusNode = ref<string>('true')
+  const focusNodeDatatype = ref<string>('http://www.w3.org/2001/XMLSchema#boolean')
   const constraintShape = ref<string | null>(null)
 
   // Actions
@@ -38,12 +38,12 @@ export const usePlaygroundStore = defineStore('playground', () => {
     shapesGraph.value = turtle
   }
 
-  function setValueNode(value: string) {
-    valueNode.value = value
+  function setFocusNode(value: string) {
+    focusNode.value = value
   }
 
-  function setValueNodeDatatype(datatype: string) {
-    valueNodeDatatype.value = datatype
+  function setFocusNodeDatatype(datatype: string) {
+    focusNodeDatatype.value = datatype
   }
 
   function setConstraintShape(shape: string | null) {
@@ -53,8 +53,8 @@ export const usePlaygroundStore = defineStore('playground', () => {
   function loadExample(
     example: {
       dataGraph: string
-      valueNode: string
-      valueNodeDatatype: string
+      focusNode: string
+      focusNodeDatatype: string
       shapesGraph: string | null
       constraintShape: string | null
     },
@@ -65,8 +65,8 @@ export const usePlaygroundStore = defineStore('playground', () => {
     }
   ) {
     setDataGraph(example.dataGraph)
-    setValueNode(example.valueNode)
-    setValueNodeDatatype(example.valueNodeDatatype)
+    setFocusNode(example.focusNode)
+    setFocusNodeDatatype(example.focusNodeDatatype)
     setShapesGraph(example.shapesGraph || '')
     setConstraintShape(example.constraintShape)
     setWidgetScoringGraph(sharedGraphs.widgetScoringGraph)
@@ -80,8 +80,8 @@ export const usePlaygroundStore = defineStore('playground', () => {
     shapesGraphShapes.value = ''
     dataGraph.value = ''
     shapesGraph.value = ''
-    valueNode.value = 'true'
-    valueNodeDatatype.value = 'http://www.w3.org/2001/XMLSchema#boolean'
+    focusNode.value = 'true'
+    focusNodeDatatype.value = 'http://www.w3.org/2001/XMLSchema#boolean'
     constraintShape.value = null
   }
 
@@ -93,8 +93,8 @@ export const usePlaygroundStore = defineStore('playground', () => {
     shapesGraphShapes,
     dataGraph,
     shapesGraph,
-    valueNode,
-    valueNodeDatatype,
+    focusNode,
+    focusNodeDatatype,
     constraintShape,
     // Actions
     setCurrentExample,
@@ -103,8 +103,8 @@ export const usePlaygroundStore = defineStore('playground', () => {
     setShapesGraphShapes,
     setDataGraph,
     setShapesGraph,
-    setValueNode,
-    setValueNodeDatatype,
+    setFocusNode,
+    setFocusNodeDatatype,
     setConstraintShape,
     loadExample,
     clear,

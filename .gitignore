@@ -16,3 +16,4 @@ playground/dist-ssr/
 playground/.vscode/*
 playground/.DS_Store
 playground/*.log
+playground/public/pyodide/*.whl

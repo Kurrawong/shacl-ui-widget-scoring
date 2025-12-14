@@ -1,0 +1,9 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  dev:
+    desc: Run the Vite development server
+    cmds:
+      - pnpm dev

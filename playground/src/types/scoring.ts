@@ -31,7 +31,7 @@ export interface ScoringResult {
   defaultWidget: string | null
   defaultScore: number | null
   executionSteps: ExecutionStep[]
-  valueNode: string
+  focusNode: string
   constraintShape?: string | null
 }
 
@@ -49,8 +49,8 @@ export interface PyodideMessage {
 }
 
 export interface ScoringRequest {
-  valueNode: string
-  valueNodeDatatype: string
+  focusNode: string
+  focusNodeDatatype: string
   widgetScoringGraph: string
   dataGraphShapes: string
   shapesGraphShapes: string
