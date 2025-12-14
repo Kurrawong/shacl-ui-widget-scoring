@@ -13,7 +13,7 @@
 
     <div class="editor-content">
       <!-- Widget Scoring Graph -->
-      <div v-if="activeTab === 'widget-scoring'" class="editor-view">
+      <div v-show="activeTab === 'widget-scoring'" class="editor-view">
         <div class="editor-header">
           <h3>Widget Scoring Graph</h3>
           <p class="editor-description">SHUI Score instances for widget recommendations</p>
@@ -21,12 +21,13 @@
         <TurtleEditor
           :model-value="widgetScoringGraph"
           height="500px"
+          :visible="activeTab === 'widget-scoring'"
           @update:model-value="(value) => $emit('update:widgetScoringGraph', value)"
         />
       </div>
 
       <!-- Data Graph Shapes -->
-      <div v-if="activeTab === 'data-graph-shapes'" class="editor-view">
+      <div v-show="activeTab === 'data-graph-shapes'" class="editor-view">
         <div class="editor-header">
           <h3>Data Graph Shapes</h3>
           <p class="editor-description">Shapes for validating data graph value nodes</p>
@@ -34,12 +35,13 @@
         <TurtleEditor
           :model-value="dataGraphShapes"
           height="500px"
+          :visible="activeTab === 'data-graph-shapes'"
           @update:model-value="(value) => $emit('update:dataGraphShapes', value)"
         />
       </div>
 
       <!-- Shapes Graph Shapes -->
-      <div v-if="activeTab === 'shapes-graph-shapes'" class="editor-view">
+      <div v-show="activeTab === 'shapes-graph-shapes'" class="editor-view">
         <div class="editor-header">
           <h3>Shapes Graph Shapes</h3>
           <p class="editor-description">Shapes for validating constraint shapes</p>
@@ -47,12 +49,13 @@
         <TurtleEditor
           :model-value="shapesGraphShapes"
           height="500px"
+          :visible="activeTab === 'shapes-graph-shapes'"
           @update:model-value="(value) => $emit('update:shapesGraphShapes', value)"
         />
       </div>
 
       <!-- Data Graph -->
-      <div v-if="activeTab === 'data-graph'" class="editor-view">
+      <div v-show="activeTab === 'data-graph'" class="editor-view">
         <div class="editor-header">
           <h3>Data Graph</h3>
           <p class="editor-description">RDF data graph containing the value node</p>
@@ -60,12 +63,13 @@
         <TurtleEditor
           :model-value="dataGraph"
           height="500px"
+          :visible="activeTab === 'data-graph'"
           @update:model-value="(value) => $emit('update:dataGraph', value)"
         />
       </div>
 
       <!-- Shapes Graph -->
-      <div v-if="activeTab === 'shapes-graph'" class="editor-view">
+      <div v-show="activeTab === 'shapes-graph'" class="editor-view">
         <div class="editor-header">
           <h3>Shapes Graph</h3>
           <p class="editor-description">SHACL shape constraints (optional)</p>
@@ -73,6 +77,7 @@
         <TurtleEditor
           :model-value="shapesGraph"
           height="500px"
+          :visible="activeTab === 'shapes-graph'"
           @update:model-value="(value) => $emit('update:shapesGraph', value)"
         />
       </div>

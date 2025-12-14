@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onBeforeUnmount, ref, watch } from "vue";
 import { useMonaco } from "@/composables/useMonaco";
 import type { Monaco } from "@monaco-editor/loader";
 
@@ -15,6 +15,7 @@ interface Props {
   readOnly?: boolean;
   height?: string;
   theme?: "light" | "dark";
+  visible?: boolean;
 }
 
 interface Emits {
@@ -27,6 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
   readOnly: false,
   height: "400px",
   theme: "dark",
+  visible: true,
 });
 
 const emit = defineEmits<Emits>();
@@ -58,6 +60,34 @@ onMounted(async () => {
   editor.onDidChangeModelContent(() => {
     emit("update:modelValue", editor.getValue());
   });
+
+  // Use ResizeObserver to detect when container gets non-zero dimensions
+  const resizeObserver = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+        editor?.layout();
+      }
+    }
+  });
+  resizeObserver.observe(editorContainer.value);
+
+  // Store observer for cleanup
+  (editorContainer.value as any)._resizeObserver = resizeObserver;
+
+  // Trigger layout after next frame to ensure container dimensions are finalized
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      editor?.layout();
+    });
+  });
+});
+
+onBeforeUnmount(() => {
+  // Clean up ResizeObserver
+  if (editorContainer.value && (editorContainer.value as any)._resizeObserver) {
+    (editorContainer.value as any)._resizeObserver.disconnect();
+  }
+  editor?.dispose();
 });
 
 watch(
@@ -96,6 +126,19 @@ watch(
       editor.updateOptions({ readOnly: isReadOnly });
     }
   }
+);
+
+watch(
+  () => props.visible,
+  (isVisible) => {
+    if (editor && isVisible) {
+      // Trigger layout when editor becomes visible using requestAnimationFrame for better timing
+      requestAnimationFrame(() => {
+        editor?.layout();
+      });
+    }
+  },
+  { immediate: true }
 );
 </script>
 

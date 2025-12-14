@@ -5,6 +5,7 @@
     :read-only="readOnly"
     :height="height"
     :theme="theme"
+    :visible="visible"
     @update:model-value="(value) => $emit('update:modelValue', value)"
   />
 </template>
@@ -17,6 +18,7 @@ interface Props {
   readOnly?: boolean
   height?: string
   theme?: 'light' | 'dark'
+  visible?: boolean
 }
 
 interface Emits {
@@ -27,6 +29,7 @@ withDefaults(defineProps<Props>(), {
   readOnly: false,
   height: '400px',
   theme: 'dark',
+  visible: true,
 })
 
 defineEmits<Emits>()
