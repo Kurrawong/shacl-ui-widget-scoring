@@ -139,10 +139,10 @@ def validate_against_shapes(
             return False
 
         # Step 2a: Check if focus_node exists in target_graph
-        # Special case: Allow Literals in empty graphs (they may be validated using temporary graphs)
-        if not (isinstance(focus_node, Literal) and len(target_graph) == 0):
-            if not _node_exists_in_graph(focus_node, target_graph):
-                return False
+        # Per spec section 4.1 and 6.2: If focus node doesn't exist in target graph,
+        # the validation fails and the score is not applicable
+        if not _node_exists_in_graph(focus_node, target_graph):
+            return False
 
         # Step 2b & 2c: Validate focus_node against shape
         if not validate_node_against_shape(

@@ -12,7 +12,6 @@ from .validation import (
     validate_widget_scoring_graph,
     extract_score_instances,
     validate_against_shapes,
-    validate_graph_against_shape,
 )
 from .exceptions import InvalidFocusNodeError, MissingGraphError
 
@@ -120,8 +119,11 @@ def score_widgets(
         )
 
         # Validate against shapesGraphShapes
-        if constraint_shape is not None:
-            # Validate constraint_shape as a focus node against each shapesGraphShape
+        # Per spec section 6.2: If constraint_shape is not provided but Score has
+        # shapesGraphShape conditions, the score is not applicable
+        if constraint_shape is None and score_inst["shapesGraphShapes"]:
+            shapes_valid = False
+        else:
             sg_to_use = shapes_graph if shapes_graph is not None else Graph()
             shapes_valid = validate_against_shapes(
                 constraint_shape,
@@ -130,17 +132,6 @@ def score_widgets(
                 shapes_graph_shapes_graph,
                 logger,
             )
-        else:
-            # No constraint_shape provided: validate using shape's own targets
-            # Shapes without explicit targets validate trivially (no violations)
-            sg_to_use = shapes_graph if shapes_graph is not None else Graph()
-            shapes_valid = True
-            for sg_shape in score_inst["shapesGraphShapes"]:
-                if not validate_graph_against_shape(
-                    sg_to_use, sg_shape, shapes_graph_shapes_graph, logger
-                ):
-                    shapes_valid = False
-                    break
 
         # If all validations passed, record the result
         if data_valid and shapes_valid:

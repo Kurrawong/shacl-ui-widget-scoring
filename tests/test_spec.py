@@ -54,7 +54,11 @@ class TestSpecCompliance(unittest.TestCase):
         self.scoring_graph.add((bn2, SH.hasValue, XSD.date))
 
     def test_spec_example_5_2_boolean(self):
-        """Test the boolean example from Spec 5.2"""
+        """Test the boolean example from Spec 5.2
+
+        Per spec section 4.1: focus node must exist in data graph for dataGraphShape
+        conditions to be applicable.
+        """
         # shui:booleanSelectEditorScore10
         self.scoring_graph.add((EX.BooleanScore, RDF.type, SHUI.Score))
         self.scoring_graph.add((EX.BooleanScore, SHUI.dataGraphShape, EX.BooleanShape))
@@ -63,8 +67,15 @@ class TestSpecCompliance(unittest.TestCase):
 
         # Test with boolean literal
         focus_node = Literal(True)
+
+        # Create data graph containing the focus node (required per spec 4.1)
+        data_graph = Graph()
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=focus_node, widget_scoring_graph=self.scoring_graph
+            focus_node=focus_node,
+            widget_scoring_graph=self.scoring_graph,
+            data_graph=data_graph,
         )
 
         self.assertEqual(len(result.widget_scores), 1)
@@ -277,7 +288,11 @@ class TestEdgeCases(unittest.TestCase):
         self.assertEqual(len(result_bad.widget_scores), 0)
 
     def test_literal_complex_shape(self):
-        """Test complex validation for Literal value node (pyshacl fallback)"""
+        """Test complex validation for Literal value node (pyshacl fallback)
+
+        Per spec section 4.1: focus node must exist in data graph for dataGraphShape
+        conditions to be applicable.
+        """
         # Define a shape that requires string length >= 3
         # shui:minLengthShape
         self.scoring_graph.add((EX.MinLengthShape, RDF.type, SH.NodeShape))
@@ -291,15 +306,27 @@ class TestEdgeCases(unittest.TestCase):
         self.scoring_graph.add((EX.LengthScore, SHUI.score, Literal(Decimal("5"))))
 
         # "foo" has length 3 -> Match
+        focus_node_match = Literal("foo")
+        data_graph_match = Graph()
+        data_graph_match.add((EX.someSubject, EX.someProperty, focus_node_match))
+
         result_match = score_widgets(
-            focus_node=Literal("foo"), widget_scoring_graph=self.scoring_graph
+            focus_node=focus_node_match,
+            widget_scoring_graph=self.scoring_graph,
+            data_graph=data_graph_match,
         )
         self.assertEqual(len(result_match.widget_scores), 1)
         self.assertEqual(result_match.default_widget, EX.LengthWidget)
 
         # "fo" has length 2 -> No Match
+        focus_node_no_match = Literal("fo")
+        data_graph_no_match = Graph()
+        data_graph_no_match.add((EX.someSubject, EX.someProperty, focus_node_no_match))
+
         result_no_match = score_widgets(
-            focus_node=Literal("fo"), widget_scoring_graph=self.scoring_graph
+            focus_node=focus_node_no_match,
+            widget_scoring_graph=self.scoring_graph,
+            data_graph=data_graph_no_match,
         )
         self.assertEqual(len(result_no_match.widget_scores), 0)
 

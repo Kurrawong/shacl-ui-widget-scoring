@@ -216,7 +216,11 @@ class TestMultipleScoresPerWidget:
         assert result.default_score == Decimal("10")
 
     def test_multiple_scores_different_conditions(self, logger):
-        """Test multiple scores for same widget with different conditions."""
+        """Test multiple scores for same widget with different conditions.
+
+        Per spec section 4.1: focus node must exist in data graph for dataGraphShape
+        conditions to be applicable.
+        """
         from rdflib.namespace import XSD
         from shui_widget_scoring.namespaces import SH
 
@@ -237,9 +241,17 @@ class TestMultipleScoresPerWidget:
         scoring_graph.add((EX.FallbackScore, SHUI.widget, EX.BooleanSelectEditor))
         scoring_graph.add((EX.FallbackScore, SHUI.score, Literal(Decimal("5"))))
 
+        # Create data graph with the focus node (required per spec 4.1)
+        focus_node = Literal(True)
+        data_graph = Graph()
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         # Test with boolean value - both scores should match, both returned
         result = score_widgets(
-            focus_node=Literal(True), widget_scoring_graph=scoring_graph, logger=logger
+            focus_node=focus_node,
+            widget_scoring_graph=scoring_graph,
+            data_graph=data_graph,
+            logger=logger,
         )
 
         # Both scores should be returned

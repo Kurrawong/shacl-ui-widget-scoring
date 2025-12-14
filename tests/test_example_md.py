@@ -139,32 +139,43 @@ class TestExampleMd:
     def test_example_1_data_graph_only(
         self, widget_scoring_graph, data_graph_shapes, shapes_graph_shapes
     ):
-        """Test Example 1: Data graph only.
+        """Test Example 1: Data graph only (no constraint_shape).
 
-        All shapesGraphShape scores without targets will pass validation.
-        This includes scores with shui:hasDatatype, shui:hasDateDatatype,
-        shui:literalNoDatatypeSpecified, and shui:hasNonLiteralNodeKind.
+        Per spec section 4.1: focus node must exist in data graph for dataGraphShape
+        conditions to be applicable.
+        Per spec section 6.2: Scores with shapesGraphShape conditions are not applicable
+        when constraint_shape is not provided.
         """
         focus_node = Literal(True)
+
+        # Create a data graph containing the focus node (required per spec 4.1)
+        data_graph = Graph()
+        data_graph.parse(
+            data="""
+            PREFIX ex: <https://example.com/>
+            ex:someSubject ex:someProperty true .
+            """,
+            format="turtle",
+        )
 
         result = score_widgets(
             focus_node=focus_node,
             widget_scoring_graph=widget_scoring_graph,
+            data_graph=data_graph,
             data_graph_shapes_graph=data_graph_shapes,
             shapes_graph_shapes_graph=shapes_graph_shapes,
         )
 
-        # Should include all scores that pass validation
-        # BooleanSelectEditor: score 10 (dataGraphShape), two scores 0 (shapesGraphShape), score -1 (shapesGraphShape)
-        # DatePickerEditor: score 5 (shapesGraphShape)
-        # Note: shapes without targets validate trivially against empty shapes graph
-        assert len(result.widget_scores) == 5
+        # Only score with dataGraphShape is applicable
+        # BooleanSelectEditor: score 10 (dataGraphShape) is the only applicable score
+        # All scores with shapesGraphShape are not applicable (no constraint_shape provided)
+        assert len(result.widget_scores) == 1
 
-        # Results should be sorted by score descending
+        # Results should be the dataGraphShape match
         assert result.widget_scores[0].score == Decimal("10")
         assert result.widget_scores[0].widget == SHUI.BooleanSelectEditor
 
-        # Default should be highest score
+        # Default should be the only score
         assert result.default_widget == SHUI.BooleanSelectEditor
         assert result.default_score == Decimal("10")
 
@@ -173,6 +184,16 @@ class TestExampleMd:
     ):
         """Test Example 2: With shapes graph constraining to non-literal - should return scores 10 and 0."""
         focus_node = Literal(True)
+
+        # Create data graph containing the focus node (required per spec 4.1)
+        data_graph = Graph()
+        data_graph.parse(
+            data="""
+            PREFIX ex: <https://example.com/>
+            ex:someSubject ex:someProperty true .
+            """,
+            format="turtle",
+        )
 
         # Create shapes graph with non-literal constraint
         shapes_graph = Graph()
@@ -189,6 +210,7 @@ class TestExampleMd:
         result = score_widgets(
             focus_node=focus_node,
             widget_scoring_graph=widget_scoring_graph,
+            data_graph=data_graph,
             constraint_shape=EX.PersonIsAdminShape,
             shapes_graph=shapes_graph,
             data_graph_shapes_graph=data_graph_shapes,
@@ -213,6 +235,16 @@ class TestExampleMd:
         """Test Example 3: With shapes graph constraining to date - should return BooleanSelectEditor (10) and DatePickerEditor (5)."""
         focus_node = Literal(True)
 
+        # Create data graph containing the focus node (required per spec 4.1)
+        data_graph = Graph()
+        data_graph.parse(
+            data="""
+            PREFIX ex: <https://example.com/>
+            ex:someSubject ex:someProperty true .
+            """,
+            format="turtle",
+        )
+
         # Create shapes graph with date constraint
         shapes_graph = Graph()
         turtle = """
@@ -229,6 +261,7 @@ class TestExampleMd:
         result = score_widgets(
             focus_node=focus_node,
             widget_scoring_graph=widget_scoring_graph,
+            data_graph=data_graph,
             constraint_shape=EX.PersonIsAdminShape,
             shapes_graph=shapes_graph,
             data_graph_shapes_graph=data_graph_shapes,

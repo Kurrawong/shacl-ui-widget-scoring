@@ -23,19 +23,24 @@ class TestScoreWidgetsBasic:
     def test_score_widgets_with_literal_value(
         self, simple_widget_scoring_graph, logger
     ):
-        """Test scoring widgets for a literal boolean value."""
-        # Create a shapes graph with boolean shape
-        shapes_graph = Graph()
-        shapes_graph.add((EX.BooleanShape, RDF.type, SH.NodeShape))
-        shapes_graph.add((EX.BooleanShape, SH.datatype, XSD.boolean))
+        """Test scoring widgets for a literal boolean value.
+
+        Per spec section 4.1: focus node must exist in data graph for dataGraphShape
+        conditions to be applicable.
+        """
+        # Create a data graph containing the focus node (literal must appear as object)
+        data_graph = Graph()
+        focus_node = Literal(True)
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
 
         # Add the boolean shape to the scoring graph
         simple_widget_scoring_graph.add((EX.BooleanShape, RDF.type, SH.NodeShape))
         simple_widget_scoring_graph.add((EX.BooleanShape, SH.datatype, XSD.boolean))
 
         result = score_widgets(
-            focus_node=Literal(True),
+            focus_node=focus_node,
             widget_scoring_graph=simple_widget_scoring_graph,
+            data_graph=data_graph,
             logger=logger,
         )
 
@@ -45,7 +50,7 @@ class TestScoreWidgetsBasic:
         assert result.default_score == Decimal("10")
 
     def test_score_widgets_empty_results(self, logger):
-        """Test scoring when no widgets match."""
+        """Test scoring when no widgets match due to shape mismatch."""
         scoring_graph = Graph()
         scoring_graph.add((EX.Score1, RDF.type, SHUI.Score))
         scoring_graph.add((EX.Score1, SHUI.widget, EX.SpecialWidget))
@@ -56,9 +61,15 @@ class TestScoreWidgetsBasic:
         scoring_graph.add((EX.DateShape, RDF.type, SH.NodeShape))
         scoring_graph.add((EX.DateShape, SH.datatype, XSD.date))
 
+        # Create data graph with the focus node
+        focus_node = Literal(True)
+        data_graph = Graph()
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal(True),  # Boolean, doesn't match date shape
+            focus_node=focus_node,  # Boolean, doesn't match date shape
             widget_scoring_graph=scoring_graph,
+            data_graph=data_graph,
             logger=logger,
         )
 
@@ -224,14 +235,14 @@ class TestScoreWidgetsWithConstraintShapes:
         assert result.default_widget == EX.SpecialWidget
 
     def test_score_with_shapesGraphShape_no_constraint_shape(self, logger):
-        """Test that Score with shapesGraphShape validates using shape's own targets when no constraint_shape provided."""
+        """Test that Score with shapesGraphShape is not applicable when no constraint_shape provided (per spec 6.2)."""
         scoring_graph = Graph()
         scoring_graph.add((EX.Score1, RDF.type, SHUI.Score))
         scoring_graph.add((EX.Score1, SHUI.widget, EX.SpecialWidget))
         scoring_graph.add((EX.Score1, SHUI.score, Literal(Decimal("10"))))
         scoring_graph.add((EX.Score1, SHUI.shapesGraphShape, EX.SomeShape))
 
-        # Add a minimal shape to the scoring graph (no targets, so it validates trivially)
+        # Add a minimal shape to the scoring graph
         scoring_graph.add((EX.SomeShape, RDF.type, SH.NodeShape))
 
         result = score_widgets(
@@ -240,10 +251,8 @@ class TestScoreWidgetsWithConstraintShapes:
             logger=logger,
         )
 
-        # Score should be applicable - the shape validates without requiring constraint_shape
-        assert len(result.widget_scores) == 1
-        assert result.widget_scores[0].widget == EX.SpecialWidget
-        assert result.widget_scores[0].score == Decimal("10")
+        # Score is not applicable - shapesGraphShape requires constraint_shape to be provided
+        assert len(result.widget_scores) == 0
 
 
 class TestScoreWidgetsDataGraphValidation:
@@ -275,3 +284,327 @@ class TestScoreWidgetsDataGraphValidation:
 
         assert len(result.widget_scores) == 1
         assert result.default_widget == EX.PersonWidget
+
+    def test_focus_node_not_in_data_graph_makes_score_inapplicable(self, logger):
+        """Test per spec section 6.2: If focus node doesn't exist in data graph, score is not applicable."""
+        # Create data graph WITHOUT the focus node
+        data_graph = Graph()
+        data_graph.add((EX.otherItem, EX.someProperty, Literal("other")))
+
+        # Create scoring graph with dataGraphShape condition
+        scoring_graph = Graph()
+        scoring_graph.add((EX.Score1, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.Score1, SHUI.widget, EX.BooleanWidget))
+        scoring_graph.add((EX.Score1, SHUI.score, Literal(Decimal("10"))))
+        scoring_graph.add((EX.Score1, SHUI.dataGraphShape, EX.BooleanShape))
+
+        # Add boolean shape
+        scoring_graph.add((EX.BooleanShape, RDF.type, SH.NodeShape))
+        scoring_graph.add((EX.BooleanShape, SH.datatype, XSD.boolean))
+
+        # Also add a default score with no conditions (should still apply)
+        scoring_graph.add((EX.DefaultScore, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.DefaultScore, SHUI.widget, EX.DefaultWidget))
+        scoring_graph.add((EX.DefaultScore, SHUI.score, Literal(Decimal("1"))))
+
+        result = score_widgets(
+            focus_node=Literal(True),  # This literal is NOT in data_graph
+            widget_scoring_graph=scoring_graph,
+            data_graph=data_graph,
+            logger=logger,
+        )
+
+        # Only DefaultScore should apply (no dataGraphShape condition)
+        # BooleanWidget score should NOT apply because focus node not in data graph
+        assert len(result.widget_scores) == 1
+        assert result.default_widget == EX.DefaultWidget
+        assert result.default_score == Decimal("1")
+
+
+class TestMultipleScoresForSameWidget:
+    """Tests for spec section 6.5: Multiple scores for same widget."""
+
+    def test_multiple_scores_same_widget_all_returned(self, logger):
+        """Test per spec 6.5: When multiple Score instances reference the same widget, ALL matching scores are returned."""
+        focus_node = Literal(True)
+
+        # Create data graph with the focus node
+        data_graph = Graph()
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
+        # Create shapes graph with boolean datatype constraint
+        shapes_graph = Graph()
+        shapes_graph.add((EX.BooleanPropertyShape, RDF.type, SH.PropertyShape))
+        shapes_graph.add((EX.BooleanPropertyShape, SH.path, EX.someProperty))
+        shapes_graph.add((EX.BooleanPropertyShape, SH.datatype, XSD.boolean))
+
+        # Create scoring graph with TWO scores for the same widget
+        scoring_graph = Graph()
+
+        # Score 10 if Focus Node is boolean (dataGraphShape condition)
+        scoring_graph.add((EX.BooleanScore10, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.BooleanScore10, SHUI.widget, EX.BooleanSelectEditor))
+        scoring_graph.add((EX.BooleanScore10, SHUI.score, Literal(Decimal("10"))))
+        scoring_graph.add((EX.BooleanScore10, SHUI.dataGraphShape, EX.IsBooleanShape))
+
+        # Score 5 if Constraint Shape has boolean datatype (shapesGraphShape condition)
+        scoring_graph.add((EX.BooleanScore5, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.BooleanScore5, SHUI.widget, EX.BooleanSelectEditor))
+        scoring_graph.add((EX.BooleanScore5, SHUI.score, Literal(Decimal("5"))))
+        scoring_graph.add((EX.BooleanScore5, SHUI.shapesGraphShape, EX.HasBooleanDatatypeShape))
+
+        # Add the dataGraphShape: checks if focus node is boolean
+        scoring_graph.add((EX.IsBooleanShape, RDF.type, SH.NodeShape))
+        scoring_graph.add((EX.IsBooleanShape, SH.datatype, XSD.boolean))
+
+        # Add the shapesGraphShape: checks if constraint shape has sh:datatype xsd:boolean
+        scoring_graph.add((EX.HasBooleanDatatypeShape, RDF.type, SH.NodeShape))
+        prop = BNode()
+        scoring_graph.add((EX.HasBooleanDatatypeShape, SH.property, prop))
+        scoring_graph.add((prop, SH.path, SH.datatype))
+        in_list = BNode()
+        scoring_graph.add((prop, SH["in"], in_list))
+        scoring_graph.add((in_list, RDF.first, XSD.boolean))
+        scoring_graph.add((in_list, RDF.rest, RDF.nil))
+
+        result = score_widgets(
+            focus_node=focus_node,
+            widget_scoring_graph=scoring_graph,
+            data_graph=data_graph,
+            constraint_shape=EX.BooleanPropertyShape,
+            shapes_graph=shapes_graph,
+            logger=logger,
+        )
+
+        # Both scores for BooleanSelectEditor should be returned
+        boolean_scores = [
+            ws for ws in result.widget_scores if ws.widget == EX.BooleanSelectEditor
+        ]
+        assert len(boolean_scores) == 2
+        scores = sorted([ws.score for ws in boolean_scores], reverse=True)
+        assert scores == [Decimal("10"), Decimal("5")]
+
+        # Default widget is the one with highest score
+        assert result.default_widget == EX.BooleanSelectEditor
+        assert result.default_score == Decimal("10")
+
+
+class TestNegativeAndZeroScores:
+    """Tests for spec sections 6.3 (negative scores) and 6.4 (zero scores)."""
+
+    def test_negative_scores_returned_in_results(self, logger):
+        """Test per spec 6.3: Negative scores are valid and appear in results."""
+        focus_node = Literal("2025-01-15", datatype=XSD.date)
+
+        # Create data graph with the focus node
+        data_graph = Graph()
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
+        scoring_graph = Graph()
+
+        # Positive score for date picker
+        scoring_graph.add((EX.DatePickerScore, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.DatePickerScore, SHUI.widget, EX.DatePickerEditor))
+        scoring_graph.add((EX.DatePickerScore, SHUI.score, Literal(Decimal("10"))))
+        scoring_graph.add((EX.DatePickerScore, SHUI.dataGraphShape, EX.IsDateShape))
+
+        # Negative score for text editor (deprioritize for dates)
+        scoring_graph.add((EX.TextEditorNegative, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.TextEditorNegative, SHUI.widget, EX.TextEditor))
+        scoring_graph.add((EX.TextEditorNegative, SHUI.score, Literal(Decimal("-5"))))
+        scoring_graph.add((EX.TextEditorNegative, SHUI.dataGraphShape, EX.IsDateShape))
+
+        # Add date shape
+        scoring_graph.add((EX.IsDateShape, RDF.type, SH.NodeShape))
+        scoring_graph.add((EX.IsDateShape, SH.datatype, XSD.date))
+
+        result = score_widgets(
+            focus_node=focus_node,
+            widget_scoring_graph=scoring_graph,
+            data_graph=data_graph,
+            logger=logger,
+        )
+
+        # Both scores should be returned
+        assert len(result.widget_scores) == 2
+
+        # Check results are sorted correctly (positive first, then negative)
+        assert result.widget_scores[0].widget == EX.DatePickerEditor
+        assert result.widget_scores[0].score == Decimal("10")
+        assert result.widget_scores[1].widget == EX.TextEditor
+        assert result.widget_scores[1].score == Decimal("-5")
+
+        # Default should be the positive score
+        assert result.default_widget == EX.DatePickerEditor
+
+    def test_zero_scores_returned_in_results(self, logger):
+        """Test per spec 6.4: Zero scores indicate widget is not selectable but still appear in results."""
+        focus_node = Literal(True)
+
+        # Create data graph with the focus node
+        data_graph = Graph()
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
+        scoring_graph = Graph()
+
+        # Positive score
+        scoring_graph.add((EX.PositiveScore, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.PositiveScore, SHUI.widget, EX.BooleanEditor))
+        scoring_graph.add((EX.PositiveScore, SHUI.score, Literal(Decimal("10"))))
+        scoring_graph.add((EX.PositiveScore, SHUI.dataGraphShape, EX.IsBooleanShape))
+
+        # Zero score (not selectable)
+        scoring_graph.add((EX.ZeroScore, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.ZeroScore, SHUI.widget, EX.NotSelectableWidget))
+        scoring_graph.add((EX.ZeroScore, SHUI.score, Literal(Decimal("0"))))
+        scoring_graph.add((EX.ZeroScore, SHUI.dataGraphShape, EX.IsBooleanShape))
+
+        # Add boolean shape
+        scoring_graph.add((EX.IsBooleanShape, RDF.type, SH.NodeShape))
+        scoring_graph.add((EX.IsBooleanShape, SH.datatype, XSD.boolean))
+
+        result = score_widgets(
+            focus_node=focus_node,
+            widget_scoring_graph=scoring_graph,
+            data_graph=data_graph,
+            logger=logger,
+        )
+
+        # Both scores should be returned
+        assert len(result.widget_scores) == 2
+
+        # Zero-scored widget should be in results
+        zero_scores = [ws for ws in result.widget_scores if ws.score == Decimal("0")]
+        assert len(zero_scores) == 1
+        assert zero_scores[0].widget == EX.NotSelectableWidget
+
+        # Default should be the positive score
+        assert result.default_widget == EX.BooleanEditor
+        assert result.default_score == Decimal("10")
+
+    def test_get_widgets_with_min_score_filters_correctly(self, logger):
+        """Test that get_widgets_with_min_score filters out zero and negative scores."""
+        focus_node = Literal(True)
+
+        # Create data graph with the focus node
+        data_graph = Graph()
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
+        scoring_graph = Graph()
+
+        # Positive score 10
+        scoring_graph.add((EX.Score10, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.Score10, SHUI.widget, EX.WidgetA))
+        scoring_graph.add((EX.Score10, SHUI.score, Literal(Decimal("10"))))
+        scoring_graph.add((EX.Score10, SHUI.dataGraphShape, EX.IsBooleanShape))
+
+        # Positive score 5
+        scoring_graph.add((EX.Score5, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.Score5, SHUI.widget, EX.WidgetB))
+        scoring_graph.add((EX.Score5, SHUI.score, Literal(Decimal("5"))))
+        scoring_graph.add((EX.Score5, SHUI.dataGraphShape, EX.IsBooleanShape))
+
+        # Zero score
+        scoring_graph.add((EX.Score0, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.Score0, SHUI.widget, EX.WidgetC))
+        scoring_graph.add((EX.Score0, SHUI.score, Literal(Decimal("0"))))
+        scoring_graph.add((EX.Score0, SHUI.dataGraphShape, EX.IsBooleanShape))
+
+        # Negative score
+        scoring_graph.add((EX.ScoreNeg, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.ScoreNeg, SHUI.widget, EX.WidgetD))
+        scoring_graph.add((EX.ScoreNeg, SHUI.score, Literal(Decimal("-3"))))
+        scoring_graph.add((EX.ScoreNeg, SHUI.dataGraphShape, EX.IsBooleanShape))
+
+        # Add boolean shape
+        scoring_graph.add((EX.IsBooleanShape, RDF.type, SH.NodeShape))
+        scoring_graph.add((EX.IsBooleanShape, SH.datatype, XSD.boolean))
+
+        result = score_widgets(
+            focus_node=focus_node,
+            widget_scoring_graph=scoring_graph,
+            data_graph=data_graph,
+            logger=logger,
+        )
+
+        # All 4 should be in results
+        assert len(result.widget_scores) == 4
+
+        # Filter with min_score=0 should return only widgets with score >= 0
+        selectable = result.get_widgets_with_min_score(Decimal("0"))
+        assert len(selectable) == 3  # Excludes negative
+
+        # Filter with min_score=1 should exclude zero and negative
+        positive_only = result.get_widgets_with_min_score(Decimal("1"))
+        assert len(positive_only) == 2
+        widgets = [ws.widget for ws in positive_only]
+        assert EX.WidgetA in widgets
+        assert EX.WidgetB in widgets
+
+
+class TestMalformedShapeValidation:
+    """Tests for spec section 4.3: Error handling for malformed shapes."""
+
+    def test_malformed_shape_makes_score_inapplicable(self, logger):
+        """Test per spec 4.3: Malformed shape validation errors should cause validation to return false."""
+        focus_node = Literal(True)
+
+        # Create data graph with the focus node
+        data_graph = Graph()
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
+        scoring_graph = Graph()
+
+        # Score with a reference to a shape that doesn't exist in the shapes graph
+        scoring_graph.add((EX.BadScore, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.BadScore, SHUI.widget, EX.BadWidget))
+        scoring_graph.add((EX.BadScore, SHUI.score, Literal(Decimal("10"))))
+        scoring_graph.add((EX.BadScore, SHUI.dataGraphShape, EX.NonExistentShape))
+
+        # Note: EX.NonExistentShape is NOT defined in scoring_graph
+        # This should cause validation to fail for this score
+
+        # Also add a valid score that should still work
+        scoring_graph.add((EX.GoodScore, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.GoodScore, SHUI.widget, EX.GoodWidget))
+        scoring_graph.add((EX.GoodScore, SHUI.score, Literal(Decimal("5"))))
+        # No dataGraphShape - always applicable
+
+        result = score_widgets(
+            focus_node=focus_node,
+            widget_scoring_graph=scoring_graph,
+            data_graph=data_graph,
+            logger=logger,
+        )
+
+        # BadScore should NOT be applicable (shape not defined)
+        # GoodScore should be applicable
+        assert len(result.widget_scores) == 1
+        assert result.default_widget == EX.GoodWidget
+        assert result.default_score == Decimal("5")
+
+
+class TestEmptyScoreConditions:
+    """Tests for spec section 6.1: Empty score conditions."""
+
+    def test_score_with_no_conditions_always_applicable(self, logger):
+        """Test per spec 6.1: Score with no dataGraphShape or shapesGraphShape is always applicable."""
+        # No data_graph provided, but score has no conditions
+        scoring_graph = Graph()
+
+        # Score with no conditions
+        scoring_graph.add((EX.DefaultScore, RDF.type, SHUI.Score))
+        scoring_graph.add((EX.DefaultScore, SHUI.widget, EX.TextEditor))
+        scoring_graph.add((EX.DefaultScore, SHUI.score, Literal(Decimal("1"))))
+        # No dataGraphShape, no shapesGraphShape
+
+        result = score_widgets(
+            focus_node=Literal("any value"),
+            widget_scoring_graph=scoring_graph,
+            logger=logger,
+        )
+
+        # Score should be applicable
+        assert len(result.widget_scores) == 1
+        assert result.default_widget == EX.TextEditor
+        assert result.default_score == Decimal("1")
