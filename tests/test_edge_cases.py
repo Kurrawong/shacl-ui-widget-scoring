@@ -26,6 +26,8 @@ class TestEmptyScoreConditions:
         result = score_widgets(
             focus_node=Literal("any value"),
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             logger=logger,
         )
 
@@ -43,15 +45,21 @@ class TestEmptyScoreConditions:
         scoring_graph.add((EX.DefaultScore, SHUI.score, Literal(Decimal("5"))))
 
         # Test with boolean
-        result1 = score_widgets(Literal(True), scoring_graph, logger=logger)
+        result1 = score_widgets(
+            Literal(True), scoring_graph, scoring_graph, scoring_graph, logger=logger
+        )
         assert result1.default_widget == EX.DefaultWidget
 
         # Test with string
-        result2 = score_widgets(Literal("test"), scoring_graph, logger=logger)
+        result2 = score_widgets(
+            Literal("test"), scoring_graph, scoring_graph, scoring_graph, logger=logger
+        )
         assert result2.default_widget == EX.DefaultWidget
 
         # Test with integer
-        result3 = score_widgets(Literal(42), scoring_graph, logger=logger)
+        result3 = score_widgets(
+            Literal(42), scoring_graph, scoring_graph, scoring_graph, logger=logger
+        )
         assert result3.default_widget == EX.DefaultWidget
 
 
@@ -70,6 +78,8 @@ class TestNegativeScores:
         result = score_widgets(
             focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             logger=logger,
         )
 
@@ -98,6 +108,8 @@ class TestNegativeScores:
         result = score_widgets(
             focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             logger=logger,
         )
 
@@ -121,6 +133,8 @@ class TestNegativeScores:
         result = score_widgets(
             focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             logger=logger,
         )
 
@@ -142,6 +156,8 @@ class TestZeroScores:
         result = score_widgets(
             focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             logger=logger,
         )
 
@@ -159,6 +175,8 @@ class TestZeroScores:
         result = score_widgets(
             focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             logger=logger,
         )
 
@@ -196,6 +214,8 @@ class TestMultipleScoresPerWidget:
         result = score_widgets(
             focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             logger=logger,
         )
 
@@ -250,6 +270,8 @@ class TestMultipleScoresPerWidget:
         result = score_widgets(
             focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             data_graph=data_graph,
             logger=logger,
         )
@@ -278,6 +300,8 @@ class TestLiteralVsNodeValueNodes:
         result = score_widgets(
             focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             logger=logger,
         )
 
@@ -300,6 +324,8 @@ class TestLiteralVsNodeValueNodes:
             score_widgets(
                 focus_node=EX.someNode,
                 widget_scoring_graph=scoring_graph,
+                data_graph_shapes_graph=scoring_graph,
+                shapes_graph_shapes_graph=scoring_graph,
                 logger=logger,
             )
 
@@ -318,6 +344,8 @@ class TestLiteralVsNodeValueNodes:
         result = score_widgets(
             focus_node=EX.item1,
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             data_graph=data_graph,
             logger=logger,
         )
@@ -346,6 +374,8 @@ class TestDecimalPrecision:
         result = score_widgets(
             focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             logger=logger,
         )
 

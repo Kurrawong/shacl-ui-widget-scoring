@@ -75,6 +75,8 @@ class TestSpecCompliance(unittest.TestCase):
         result = score_widgets(
             focus_node=focus_node,
             widget_scoring_graph=self.scoring_graph,
+            data_graph_shapes_graph=self.scoring_graph,
+            shapes_graph_shapes_graph=self.scoring_graph,
             data_graph=data_graph,
         )
 
@@ -99,6 +101,8 @@ class TestSpecCompliance(unittest.TestCase):
         result = score_widgets(
             focus_node=focus_node,
             widget_scoring_graph=self.scoring_graph,
+            data_graph_shapes_graph=self.scoring_graph,
+            shapes_graph_shapes_graph=self.scoring_graph,
             constraint_shape=EX.MyPropShape,
             shapes_graph=self.shapes_graph,
         )
@@ -124,7 +128,10 @@ class TestEdgeCases(unittest.TestCase):
         self.scoring_graph.add((EX.DefaultScore, SHUI.score, Literal(Decimal("1"))))
 
         result = score_widgets(
-            focus_node=Literal("foo"), widget_scoring_graph=self.scoring_graph
+            focus_node=Literal("foo"),
+            widget_scoring_graph=self.scoring_graph,
+            data_graph_shapes_graph=self.scoring_graph,
+            shapes_graph_shapes_graph=self.scoring_graph,
         )
         self.assertEqual(len(result.widget_scores), 1)
         self.assertEqual(result.default_widget, EX.TextEditor)
@@ -143,7 +150,10 @@ class TestEdgeCases(unittest.TestCase):
         self.scoring_graph.add((EX.Negative, SHUI.score, Literal(Decimal("-5"))))
 
         result = score_widgets(
-            focus_node=Literal("foo"), widget_scoring_graph=self.scoring_graph
+            focus_node=Literal("foo"),
+            widget_scoring_graph=self.scoring_graph,
+            data_graph_shapes_graph=self.scoring_graph,
+            shapes_graph_shapes_graph=self.scoring_graph,
         )
 
         self.assertEqual(len(result.widget_scores), 2)
@@ -158,7 +168,10 @@ class TestEdgeCases(unittest.TestCase):
         self.scoring_graph.add((EX.Zero, SHUI.score, Literal(Decimal("0"))))
 
         result = score_widgets(
-            focus_node=Literal("foo"), widget_scoring_graph=self.scoring_graph
+            focus_node=Literal("foo"),
+            widget_scoring_graph=self.scoring_graph,
+            data_graph_shapes_graph=self.scoring_graph,
+            shapes_graph_shapes_graph=self.scoring_graph,
         )
         self.assertEqual(len(result.widget_scores), 1)
         self.assertEqual(result.default_score, Decimal("0"))
@@ -176,7 +189,10 @@ class TestEdgeCases(unittest.TestCase):
         self.scoring_graph.add((EX.Score2, SHUI.score, Literal(Decimal("5"))))
 
         result = score_widgets(
-            focus_node=Literal("foo"), widget_scoring_graph=self.scoring_graph
+            focus_node=Literal("foo"),
+            widget_scoring_graph=self.scoring_graph,
+            data_graph_shapes_graph=self.scoring_graph,
+            shapes_graph_shapes_graph=self.scoring_graph,
         )
 
         # Both scores should be returned
@@ -212,6 +228,8 @@ class TestEdgeCases(unittest.TestCase):
         result = score_widgets(
             focus_node=Literal("foo"),
             widget_scoring_graph=self.scoring_graph,
+            data_graph_shapes_graph=self.scoring_graph,
+            shapes_graph_shapes_graph=self.scoring_graph,
             constraint_shape=constraint_shape,
             shapes_graph=self.shapes_graph,
         )
@@ -225,6 +243,8 @@ class TestEdgeCases(unittest.TestCase):
         result_bad = score_widgets(
             focus_node=Literal("foo"),
             widget_scoring_graph=self.scoring_graph,
+            data_graph_shapes_graph=self.scoring_graph,
+            shapes_graph_shapes_graph=self.scoring_graph,
             constraint_shape=constraint_shape_bad,
             shapes_graph=self.shapes_graph,
         )
@@ -266,6 +286,8 @@ class TestEdgeCases(unittest.TestCase):
         result = score_widgets(
             focus_node=Literal("foo"),  # Irrelevant for shapesGraphShape check
             widget_scoring_graph=self.scoring_graph,
+            data_graph_shapes_graph=self.scoring_graph,
+            shapes_graph_shapes_graph=self.scoring_graph,
             constraint_shape=constraint_shape,
             shapes_graph=self.shapes_graph,
         )
@@ -282,6 +304,8 @@ class TestEdgeCases(unittest.TestCase):
         result_bad = score_widgets(
             focus_node=Literal("foo"),
             widget_scoring_graph=self.scoring_graph,
+            data_graph_shapes_graph=self.scoring_graph,
+            shapes_graph_shapes_graph=self.scoring_graph,
             constraint_shape=constraint_shape_bad,
             shapes_graph=self.shapes_graph,
         )
@@ -313,6 +337,8 @@ class TestEdgeCases(unittest.TestCase):
         result_match = score_widgets(
             focus_node=focus_node_match,
             widget_scoring_graph=self.scoring_graph,
+            data_graph_shapes_graph=self.scoring_graph,
+            shapes_graph_shapes_graph=self.scoring_graph,
             data_graph=data_graph_match,
         )
         self.assertEqual(len(result_match.widget_scores), 1)
@@ -326,6 +352,8 @@ class TestEdgeCases(unittest.TestCase):
         result_no_match = score_widgets(
             focus_node=focus_node_no_match,
             widget_scoring_graph=self.scoring_graph,
+            data_graph_shapes_graph=self.scoring_graph,
+            shapes_graph_shapes_graph=self.scoring_graph,
             data_graph=data_graph_no_match,
         )
         self.assertEqual(len(result_no_match.widget_scores), 0)

@@ -93,7 +93,7 @@ tests/
 - **`exceptions.py`**: Custom exception hierarchy:
   - `ShuiWidgetScoringError`: Base exception class (parent of all custom exceptions)
   - `MalformedScoreError`: Score instance violates SHACL constraints
-  - `InvalidValueNodeError`: Invalid value_node parameter type
+  - `InvalidFocusNodeError`: Invalid focus_node parameter type
   - `MissingGraphError`: Required graph not provided for validation
 - **`namespaces.py`**: RDF namespace constants (SHUI, SH, XSD)
 
@@ -106,7 +106,7 @@ tests/
   - `ScoringResult` - Data structure containing all results
   - `ShuiWidgetScoringError` - Base exception class
   - `MalformedScoreError` - Exception for invalid Score instances
-  - `InvalidValueNodeError` - Exception for invalid inputs
+  - `InvalidFocusNodeError` - Exception for invalid inputs
   - `MissingGraphError` - Exception for missing required graphs
   - `SHUI` - SHACL UI namespace constant
   - `SH` - SHACL namespace constant

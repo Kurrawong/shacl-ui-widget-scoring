@@ -19,11 +19,11 @@ from .exceptions import InvalidFocusNodeError, MissingGraphError
 def score_widgets(
     focus_node: Union[URIRef, BNode, Literal],
     widget_scoring_graph: Graph,
+    data_graph_shapes_graph: Graph,
+    shapes_graph_shapes_graph: Graph,
     data_graph: Optional[Graph] = None,
     constraint_shape: Optional[Union[URIRef, BNode]] = None,
     shapes_graph: Optional[Graph] = None,
-    data_graph_shapes_graph: Optional[Graph] = None,
-    shapes_graph_shapes_graph: Optional[Graph] = None,
     logger: Optional[logging.Logger] = None,
 ) -> ScoringResult:
     """
@@ -37,11 +37,11 @@ def score_widgets(
     Args:
         focus_node: The node in the data graph to score widgets for (URIRef, BNode, or Literal)
         widget_scoring_graph: Graph containing shui:Score instances
+        data_graph_shapes_graph: Graph containing shapes for dataGraphShape validation
+        shapes_graph_shapes_graph: Graph containing shapes for shapesGraphShape validation
         data_graph: The data graph containing the focus node (optional for Literals)
         constraint_shape: The SHACL shape constraining the focus node (optional)
         shapes_graph: The shapes graph containing constraint_shape (required if constraint_shape provided)
-        data_graph_shapes_graph: Graph containing shapes for dataGraphShape validation (defaults to widget_scoring_graph)
-        shapes_graph_shapes_graph: Graph containing shapes for shapesGraphShape validation (defaults to widget_scoring_graph)
         logger: Optional logger for warnings and debug messages
 
     Returns:
@@ -69,13 +69,6 @@ def score_widgets(
         ... )
         >>> print(result.default_widget)  # Highest-scoring widget
     """
-    # Backward compatibility: if separate shape graphs not provided,
-    # use widget_scoring_graph (old behavior)
-    if data_graph_shapes_graph is None:
-        data_graph_shapes_graph = widget_scoring_graph
-    if shapes_graph_shapes_graph is None:
-        shapes_graph_shapes_graph = widget_scoring_graph
-
     # Step a: Validate Widget Scoring Graph
     # This ensures all Score instances are well-formed before processing
     validate_widget_scoring_graph(widget_scoring_graph, logger=logger)

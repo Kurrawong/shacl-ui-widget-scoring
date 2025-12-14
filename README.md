@@ -56,8 +56,10 @@ scoring_graph.parse(data=turtle_data, format="turtle")
 
 # Score widgets for a boolean value
 result = score_widgets(
-    value_node=Literal(True),
-    widget_scoring_graph=scoring_graph
+    focus_node=Literal(True),
+    widget_scoring_graph=scoring_graph,
+    data_graph_shapes_graph=scoring_graph,
+    shapes_graph_shapes_graph=scoring_graph,
 )
 
 print(f"Recommended: {result.default_widget} ({result.default_score})")
@@ -70,8 +72,10 @@ print(f"Recommended: {result.default_widget} ({result.default_score})")
 
 ```python
 score_widgets(
-    value_node: URIRef | BNode | Literal,
+    focus_node: URIRef | BNode | Literal,
     widget_scoring_graph: Graph,
+    data_graph_shapes_graph: Graph,
+    shapes_graph_shapes_graph: Graph,
     data_graph: Graph | None = None,
     constraint_shape: URIRef | None = None,
     shapes_graph: Graph | None = None,
@@ -81,10 +85,12 @@ score_widgets(
 
 **Parameters:**
 
-- `value_node`: The node to score widgets for
+- `focus_node`: The node to score widgets for
 - `widget_scoring_graph`: Graph containing `shui:Score` instances
-- `data_graph`: Optional; required when `value_node` is a URIRef or BNode
-- `constraint_shape`: Optional; SHACL shape constraining the value
+- `data_graph_shapes_graph`: Graph containing shapes for dataGraphShape validation
+- `shapes_graph_shapes_graph`: Graph containing shapes for shapesGraphShape validation
+- `data_graph`: Optional; required when `focus_node` is a URIRef or BNode
+- `constraint_shape`: Optional; SHACL shape constraining the focus node
 - `shapes_graph`: Optional; required if `constraint_shape` is provided
 - `logger`: Optional; Python logger for validation warnings
 
@@ -93,7 +99,7 @@ score_widgets(
 ### `ScoringResult`
 
 ```python
-result = score_widgets(value_node, widget_scoring_graph)
+result = score_widgets(focus_node, widget_scoring_graph, data_graph_shapes_graph, shapes_graph_shapes_graph)
 
 # Get top recommendation
 widget = result.default_widget        # URIRef of highest-scoring widget
@@ -187,16 +193,16 @@ The library raises specific exceptions for error conditions:
 ```python
 from shui_widget_scoring import (
     MalformedScoreError,    # Invalid Score instance
-    InvalidValueNodeError,  # Invalid value_node type
+    InvalidFocusNodeError,  # Invalid focus_node type
     MissingGraphError,      # Required graph not provided
 )
 
 try:
-    result = score_widgets(value_node, scoring_graph)
+    result = score_widgets(focus_node, scoring_graph, data_graph_shapes_graph, shapes_graph_shapes_graph)
 except MalformedScoreError as e:
     print(f"Invalid Score: {e}")
-except InvalidValueNodeError as e:
-    print(f"Invalid value node: {e}")
+except InvalidFocusNodeError as e:
+    print(f"Invalid focus node: {e}")
 except MissingGraphError as e:
     print(f"Missing required graph: {e}")
 ```

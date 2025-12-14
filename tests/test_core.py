@@ -40,6 +40,8 @@ class TestScoreWidgetsBasic:
         result = score_widgets(
             focus_node=focus_node,
             widget_scoring_graph=simple_widget_scoring_graph,
+            data_graph_shapes_graph=simple_widget_scoring_graph,
+            shapes_graph_shapes_graph=simple_widget_scoring_graph,
             data_graph=data_graph,
             logger=logger,
         )
@@ -69,6 +71,8 @@ class TestScoreWidgetsBasic:
         result = score_widgets(
             focus_node=focus_node,  # Boolean, doesn't match date shape
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             data_graph=data_graph,
             logger=logger,
         )
@@ -99,6 +103,8 @@ class TestScoreWidgetsBasic:
         result = score_widgets(
             focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             logger=logger,
         )
 
@@ -138,6 +144,8 @@ class TestScoreWidgetsBasic:
         result = score_widgets(
             focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             logger=logger,
         )
 
@@ -156,13 +164,18 @@ class TestScoreWidgetsInputValidation:
             score_widgets(
                 focus_node="not a valid node",
                 widget_scoring_graph=simple_widget_scoring_graph,
+                data_graph_shapes_graph=simple_widget_scoring_graph,
+                shapes_graph_shapes_graph=simple_widget_scoring_graph,
             )
 
     def test_uriref_focus_node_requires_data_graph(self, simple_widget_scoring_graph):
         """Test that URIRef focus_node requires data_graph."""
         with pytest.raises(MissingGraphError) as exc_info:
             score_widgets(
-                focus_node=EX.someNode, widget_scoring_graph=simple_widget_scoring_graph
+                focus_node=EX.someNode,
+                widget_scoring_graph=simple_widget_scoring_graph,
+                data_graph_shapes_graph=simple_widget_scoring_graph,
+                shapes_graph_shapes_graph=simple_widget_scoring_graph,
             )
 
         assert "data_graph" in str(exc_info.value)
@@ -171,7 +184,10 @@ class TestScoreWidgetsInputValidation:
         """Test that BNode focus_node requires data_graph."""
         with pytest.raises(MissingGraphError) as exc_info:
             score_widgets(
-                focus_node=BNode(), widget_scoring_graph=simple_widget_scoring_graph
+                focus_node=BNode(),
+                widget_scoring_graph=simple_widget_scoring_graph,
+                data_graph_shapes_graph=simple_widget_scoring_graph,
+                shapes_graph_shapes_graph=simple_widget_scoring_graph,
             )
 
         assert "data_graph" in str(exc_info.value)
@@ -182,6 +198,8 @@ class TestScoreWidgetsInputValidation:
             score_widgets(
                 focus_node=Literal("test"),
                 widget_scoring_graph=simple_widget_scoring_graph,
+                data_graph_shapes_graph=simple_widget_scoring_graph,
+                shapes_graph_shapes_graph=simple_widget_scoring_graph,
                 constraint_shape=EX.SomeShape,
             )
 
@@ -195,6 +213,8 @@ class TestScoreWidgetsInputValidation:
             score_widgets(
                 focus_node=Literal("test"),
                 widget_scoring_graph=malformed_scoring_graph_no_widget,
+                data_graph_shapes_graph=malformed_scoring_graph_no_widget,
+                shapes_graph_shapes_graph=malformed_scoring_graph_no_widget,
             )
 
 
@@ -226,6 +246,8 @@ class TestScoreWidgetsWithConstraintShapes:
         result = score_widgets(
             focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             constraint_shape=EX.PropertyShape,
             shapes_graph=shapes_graph,
             logger=logger,
@@ -248,6 +270,8 @@ class TestScoreWidgetsWithConstraintShapes:
         result = score_widgets(
             focus_node=Literal("test"),
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             logger=logger,
         )
 
@@ -278,6 +302,8 @@ class TestScoreWidgetsDataGraphValidation:
         result = score_widgets(
             focus_node=EX.item1,
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             data_graph=data_graph,
             logger=logger,
         )
@@ -310,6 +336,8 @@ class TestScoreWidgetsDataGraphValidation:
         result = score_widgets(
             focus_node=Literal(True),  # This literal is NOT in data_graph
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             data_graph=data_graph,
             logger=logger,
         )
@@ -370,6 +398,8 @@ class TestMultipleScoresForSameWidget:
         result = score_widgets(
             focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             data_graph=data_graph,
             constraint_shape=EX.BooleanPropertyShape,
             shapes_graph=shapes_graph,
@@ -421,6 +451,8 @@ class TestNegativeAndZeroScores:
         result = score_widgets(
             focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             data_graph=data_graph,
             logger=logger,
         )
@@ -466,6 +498,8 @@ class TestNegativeAndZeroScores:
         result = score_widgets(
             focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             data_graph=data_graph,
             logger=logger,
         )
@@ -523,6 +557,8 @@ class TestNegativeAndZeroScores:
         result = score_widgets(
             focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             data_graph=data_graph,
             logger=logger,
         )
@@ -573,6 +609,8 @@ class TestMalformedShapeValidation:
         result = score_widgets(
             focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             data_graph=data_graph,
             logger=logger,
         )
@@ -601,6 +639,8 @@ class TestEmptyScoreConditions:
         result = score_widgets(
             focus_node=Literal("any value"),
             widget_scoring_graph=scoring_graph,
+            data_graph_shapes_graph=scoring_graph,
+            shapes_graph_shapes_graph=scoring_graph,
             logger=logger,
         )
 
