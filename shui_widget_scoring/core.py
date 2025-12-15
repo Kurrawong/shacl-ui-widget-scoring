@@ -4,10 +4,8 @@ import logging
 from typing import Optional, Union
 
 from rdflib import Graph, URIRef, BNode, Literal
-from rdflib.namespace import RDF
 
 from .models import WidgetScore, ScoringResult
-from .namespaces import SH
 from .validation import (
     validate_widget_scoring_graph,
     extract_score_instances,

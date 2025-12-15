@@ -10,7 +10,7 @@ from pathlib import Path
 # Add parent directory to path to import example.py
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "shui-widget-scoring"))
 
-from rdflib import Literal, Namespace
+from rdflib import Namespace
 from example import (
     create_widget_scoring_graph,
     create_data_graph_shapes,

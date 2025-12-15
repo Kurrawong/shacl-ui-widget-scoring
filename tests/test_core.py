@@ -379,7 +379,9 @@ class TestMultipleScoresForSameWidget:
         scoring_graph.add((EX.BooleanScore5, RDF.type, SHUI.Score))
         scoring_graph.add((EX.BooleanScore5, SHUI.widget, EX.BooleanSelectEditor))
         scoring_graph.add((EX.BooleanScore5, SHUI.score, Literal(Decimal("5"))))
-        scoring_graph.add((EX.BooleanScore5, SHUI.shapesGraphShape, EX.HasBooleanDatatypeShape))
+        scoring_graph.add(
+            (EX.BooleanScore5, SHUI.shapesGraphShape, EX.HasBooleanDatatypeShape)
+        )
 
         # Add the dataGraphShape: checks if focus node is boolean
         scoring_graph.add((EX.IsBooleanShape, RDF.type, SH.NodeShape))
