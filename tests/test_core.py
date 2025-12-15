@@ -100,11 +100,17 @@ class TestScoreWidgetsBasic:
         scoring_graph.add((EX.Score3, SHUI.widget, EX.MediumWidget))
         scoring_graph.add((EX.Score3, SHUI.score, Literal(Decimal("5"))))
 
+        # Create data graph containing the focus node
+        data_graph = Graph()
+        focus_node = Literal("test")
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal("test"),
+            focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
             data_graph_shapes_graph=scoring_graph,
             shapes_graph_shapes_graph=scoring_graph,
+            data_graph=data_graph,
             logger=logger,
         )
 
@@ -141,10 +147,16 @@ class TestScoreWidgetsBasic:
         )
         scoring_graph.add((EX.ScoreM, SHUI.score, Literal(Decimal("10"))))
 
+        # Create data graph containing the focus node
+        data_graph = Graph()
+        focus_node = Literal("test")
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal("test"),
+            focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
             data_graph_shapes_graph=scoring_graph,
+            data_graph=data_graph,
             shapes_graph_shapes_graph=scoring_graph,
             logger=logger,
         )
@@ -180,6 +192,18 @@ class TestScoreWidgetsInputValidation:
 
         assert "data_graph" in str(exc_info.value)
 
+    def test_literal_focus_node_requires_data_graph(self, simple_widget_scoring_graph):
+        """Test that Literal focus_node requires data_graph per spec section 4.1."""
+        with pytest.raises(MissingGraphError) as exc_info:
+            score_widgets(
+                focus_node=Literal("test"),
+                widget_scoring_graph=simple_widget_scoring_graph,
+                data_graph_shapes_graph=simple_widget_scoring_graph,
+                shapes_graph_shapes_graph=simple_widget_scoring_graph,
+            )
+
+        assert "data_graph" in str(exc_info.value)
+
     def test_bnode_focus_node_requires_data_graph(self, simple_widget_scoring_graph):
         """Test that BNode focus_node requires data_graph."""
         with pytest.raises(MissingGraphError) as exc_info:
@@ -194,6 +218,10 @@ class TestScoreWidgetsInputValidation:
 
     def test_constraint_shape_requires_shapes_graph(self, simple_widget_scoring_graph):
         """Test that constraint_shape requires shapes_graph."""
+        # Create data graph to avoid data_graph error
+        data_graph = Graph()
+        data_graph.add((EX.someSubject, EX.someProperty, Literal("test")))
+
         with pytest.raises(MissingGraphError) as exc_info:
             score_widgets(
                 focus_node=Literal("test"),
@@ -201,6 +229,7 @@ class TestScoreWidgetsInputValidation:
                 data_graph_shapes_graph=simple_widget_scoring_graph,
                 shapes_graph_shapes_graph=simple_widget_scoring_graph,
                 constraint_shape=EX.SomeShape,
+                data_graph=data_graph,
             )
 
         assert "shapes_graph" in str(exc_info.value)
@@ -209,12 +238,17 @@ class TestScoreWidgetsInputValidation:
         self, malformed_scoring_graph_no_widget
     ):
         """Test that malformed widget scoring graph raises MalformedScoreError."""
+        # Create data graph to avoid data_graph error
+        data_graph = Graph()
+        data_graph.add((EX.someSubject, EX.someProperty, Literal("test")))
+
         with pytest.raises(MalformedScoreError):
             score_widgets(
                 focus_node=Literal("test"),
                 widget_scoring_graph=malformed_scoring_graph_no_widget,
                 data_graph_shapes_graph=malformed_scoring_graph_no_widget,
                 shapes_graph_shapes_graph=malformed_scoring_graph_no_widget,
+                data_graph=data_graph,
             )
 
 
@@ -243,13 +277,19 @@ class TestScoreWidgetsWithConstraintShapes:
         scoring_graph.add((prop, SH.path, SH.datatype))
         scoring_graph.add((prop, SH.minCount, Literal(1)))
 
+        # Create data graph containing the focus node
+        data_graph = Graph()
+        focus_node = Literal("test")
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal("test"),
+            focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
             data_graph_shapes_graph=scoring_graph,
             shapes_graph_shapes_graph=scoring_graph,
             constraint_shape=EX.PropertyShape,
             shapes_graph=shapes_graph,
+            data_graph=data_graph,
             logger=logger,
         )
 
@@ -267,11 +307,17 @@ class TestScoreWidgetsWithConstraintShapes:
         # Add a minimal shape to the scoring graph
         scoring_graph.add((EX.SomeShape, RDF.type, SH.NodeShape))
 
+        # Create data graph containing the focus node
+        data_graph = Graph()
+        focus_node = Literal("test")
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal("test"),
+            focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
             data_graph_shapes_graph=scoring_graph,
             shapes_graph_shapes_graph=scoring_graph,
+            data_graph=data_graph,
             logger=logger,
         )
 
@@ -629,7 +675,6 @@ class TestEmptyScoreConditions:
 
     def test_score_with_no_conditions_always_applicable(self, logger):
         """Test per spec 6.1: Score with no dataGraphShape or shapesGraphShape is always applicable."""
-        # No data_graph provided, but score has no conditions
         scoring_graph = Graph()
 
         # Score with no conditions
@@ -638,11 +683,17 @@ class TestEmptyScoreConditions:
         scoring_graph.add((EX.DefaultScore, SHUI.score, Literal(Decimal("1"))))
         # No dataGraphShape, no shapesGraphShape
 
+        # Create data graph containing the focus node
+        data_graph = Graph()
+        focus_node = Literal("any value")
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal("any value"),
+            focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
             data_graph_shapes_graph=scoring_graph,
             shapes_graph_shapes_graph=scoring_graph,
+            data_graph=data_graph,
             logger=logger,
         )
 

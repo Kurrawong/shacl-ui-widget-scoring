@@ -127,11 +127,16 @@ class TestEdgeCases(unittest.TestCase):
         self.scoring_graph.add((EX.DefaultScore, SHUI.widget, EX.TextEditor))
         self.scoring_graph.add((EX.DefaultScore, SHUI.score, Literal(Decimal("1"))))
 
+        focus_node = Literal("foo")
+        data_graph = Graph()
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal("foo"),
+            focus_node=focus_node,
             widget_scoring_graph=self.scoring_graph,
             data_graph_shapes_graph=self.scoring_graph,
             shapes_graph_shapes_graph=self.scoring_graph,
+            data_graph=data_graph,
         )
         self.assertEqual(len(result.widget_scores), 1)
         self.assertEqual(result.default_widget, EX.TextEditor)

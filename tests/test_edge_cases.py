@@ -23,11 +23,17 @@ class TestEmptyScoreConditions:
         scoring_graph.add((EX.DefaultScore, SHUI.widget, EX.TextEditor))
         scoring_graph.add((EX.DefaultScore, SHUI.score, Literal(Decimal("1"))))
 
+        # Create data graph containing the focus node
+        data_graph = Graph()
+        focus_node = Literal("any value")
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal("any value"),
+            focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
             data_graph_shapes_graph=scoring_graph,
             shapes_graph_shapes_graph=scoring_graph,
+            data_graph=data_graph,
             logger=logger,
         )
 
@@ -44,21 +50,43 @@ class TestEmptyScoreConditions:
         scoring_graph.add((EX.DefaultScore, SHUI.widget, EX.DefaultWidget))
         scoring_graph.add((EX.DefaultScore, SHUI.score, Literal(Decimal("5"))))
 
-        # Test with boolean
+        # Create data graph and test with boolean
+        data_graph = Graph()
+        boolean_node = Literal(True)
+        data_graph.add((EX.someSubject, EX.someProperty, boolean_node))
         result1 = score_widgets(
-            Literal(True), scoring_graph, scoring_graph, scoring_graph, logger=logger
+            boolean_node,
+            scoring_graph,
+            scoring_graph,
+            scoring_graph,
+            data_graph=data_graph,
+            logger=logger,
         )
         assert result1.default_widget == EX.DefaultWidget
 
         # Test with string
+        string_node = Literal("test")
+        data_graph.add((EX.someSubject, EX.someProperty, string_node))
         result2 = score_widgets(
-            Literal("test"), scoring_graph, scoring_graph, scoring_graph, logger=logger
+            string_node,
+            scoring_graph,
+            scoring_graph,
+            scoring_graph,
+            data_graph=data_graph,
+            logger=logger,
         )
         assert result2.default_widget == EX.DefaultWidget
 
         # Test with integer
+        int_node = Literal(42)
+        data_graph.add((EX.someSubject, EX.someProperty, int_node))
         result3 = score_widgets(
-            Literal(42), scoring_graph, scoring_graph, scoring_graph, logger=logger
+            int_node,
+            scoring_graph,
+            scoring_graph,
+            scoring_graph,
+            data_graph=data_graph,
+            logger=logger,
         )
         assert result3.default_widget == EX.DefaultWidget
 
@@ -75,11 +103,17 @@ class TestNegativeScores:
         scoring_graph.add((EX.NegativeScore, SHUI.widget, EX.DeprioritizedWidget))
         scoring_graph.add((EX.NegativeScore, SHUI.score, Literal(Decimal("-5"))))
 
+        # Create data graph containing the focus node
+        data_graph = Graph()
+        focus_node = Literal("test")
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal("test"),
+            focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
             data_graph_shapes_graph=scoring_graph,
             shapes_graph_shapes_graph=scoring_graph,
+            data_graph=data_graph,
             logger=logger,
         )
 
@@ -105,11 +139,17 @@ class TestNegativeScores:
         scoring_graph.add((EX.Score3, SHUI.widget, EX.Widget3))
         scoring_graph.add((EX.Score3, SHUI.score, Literal(Decimal("-5"))))
 
+        # Create data graph containing the focus node
+        data_graph = Graph()
+        focus_node = Literal("test")
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal("test"),
+            focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
             data_graph_shapes_graph=scoring_graph,
             shapes_graph_shapes_graph=scoring_graph,
+            data_graph=data_graph,
             logger=logger,
         )
 
@@ -130,11 +170,17 @@ class TestNegativeScores:
         scoring_graph.add((EX.Score2, SHUI.widget, EX.Widget2))
         scoring_graph.add((EX.Score2, SHUI.score, Literal(Decimal("-2"))))
 
+        # Create data graph containing the focus node
+        data_graph = Graph()
+        focus_node = Literal("test")
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal("test"),
+            focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
             data_graph_shapes_graph=scoring_graph,
             shapes_graph_shapes_graph=scoring_graph,
+            data_graph=data_graph,
             logger=logger,
         )
 
@@ -153,11 +199,17 @@ class TestZeroScores:
         scoring_graph.add((EX.ZeroScore, SHUI.widget, EX.NotSelectableWidget))
         scoring_graph.add((EX.ZeroScore, SHUI.score, Literal(Decimal("0"))))
 
+        # Create data graph containing the focus node
+        data_graph = Graph()
+        focus_node = Literal("test")
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal("test"),
+            focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
             data_graph_shapes_graph=scoring_graph,
             shapes_graph_shapes_graph=scoring_graph,
+            data_graph=data_graph,
             logger=logger,
         )
 
@@ -172,11 +224,17 @@ class TestZeroScores:
         scoring_graph.add((EX.ZeroScore, SHUI.widget, EX.ZeroWidget))
         scoring_graph.add((EX.ZeroScore, SHUI.score, Literal(Decimal("0"))))
 
+        # Create data graph containing the focus node
+        data_graph = Graph()
+        focus_node = Literal("test")
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal("test"),
+            focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
             data_graph_shapes_graph=scoring_graph,
             shapes_graph_shapes_graph=scoring_graph,
+            data_graph=data_graph,
             logger=logger,
         )
 
@@ -211,11 +269,17 @@ class TestMultipleScoresPerWidget:
         scoring_graph.add((EX.Score3, SHUI.widget, EX.BooleanSelectEditor))
         scoring_graph.add((EX.Score3, SHUI.score, Literal(Decimal("2"))))
 
+        # Create data graph containing the focus node
+        data_graph = Graph()
+        focus_node = Literal("test")
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal("test"),
+            focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
             data_graph_shapes_graph=scoring_graph,
             shapes_graph_shapes_graph=scoring_graph,
+            data_graph=data_graph,
             logger=logger,
         )
 
@@ -288,25 +352,26 @@ class TestMultipleScoresPerWidget:
 class TestLiteralVsNodeValueNodes:
     """Test handling of Literal vs URIRef/BNode value nodes."""
 
-    def test_literal_focus_node_no_data_graph_needed(self, logger):
-        """Test that Literal value nodes don't require data_graph."""
+    def test_literal_focus_node_requires_data_graph(self, logger):
+        """Test that Literal value nodes require data_graph per spec section 4.1."""
+        from shui_widget_scoring.exceptions import MissingGraphError
+        import pytest
+
         scoring_graph = Graph()
 
         scoring_graph.add((EX.Score1, RDF.type, SHUI.Score))
         scoring_graph.add((EX.Score1, SHUI.widget, EX.TextWidget))
         scoring_graph.add((EX.Score1, SHUI.score, Literal(Decimal("5"))))
 
-        # Should work without data_graph for Literal
-        result = score_widgets(
-            focus_node=Literal("test"),
-            widget_scoring_graph=scoring_graph,
-            data_graph_shapes_graph=scoring_graph,
-            shapes_graph_shapes_graph=scoring_graph,
-            logger=logger,
-        )
-
-        assert len(result.widget_scores) == 1
-        assert result.default_widget == EX.TextWidget
+        # Should raise MissingGraphError without data_graph
+        with pytest.raises(MissingGraphError):
+            score_widgets(
+                focus_node=Literal("test"),
+                widget_scoring_graph=scoring_graph,
+                data_graph_shapes_graph=scoring_graph,
+                shapes_graph_shapes_graph=scoring_graph,
+                logger=logger,
+            )
 
     def test_uriref_focus_node_requires_data_graph(self, logger):
         """Test that URIRef value nodes require data_graph."""
@@ -371,11 +436,17 @@ class TestDecimalPrecision:
         scoring_graph.add((EX.Score2, SHUI.widget, EX.Widget2))
         scoring_graph.add((EX.Score2, SHUI.score, Literal(Decimal("10.2"))))
 
+        # Create data graph containing the focus node
+        data_graph = Graph()
+        focus_node = Literal("test")
+        data_graph.add((EX.someSubject, EX.someProperty, focus_node))
+
         result = score_widgets(
-            focus_node=Literal("test"),
+            focus_node=focus_node,
             widget_scoring_graph=scoring_graph,
             data_graph_shapes_graph=scoring_graph,
             shapes_graph_shapes_graph=scoring_graph,
+            data_graph=data_graph,
             logger=logger,
         )
 

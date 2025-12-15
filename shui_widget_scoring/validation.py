@@ -119,7 +119,7 @@ def validate_against_shapes(
     Logic:
         1. If shapes is empty, return True
         2. For each shape:
-           a. If focus_node does not exist in target_graph, return False (unless it's a Literal in an empty graph)
+           a. If focus_node does not exist in target_graph, return False
            b. Validate focus_node against shape using target_graph as data graph
            c. If validation produces violations, return False
         3. Return True

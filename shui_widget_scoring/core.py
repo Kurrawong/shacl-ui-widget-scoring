@@ -37,7 +37,7 @@ def score_widgets(
         widget_scoring_graph: Graph containing shui:Score instances
         data_graph_shapes_graph: Graph containing shapes for dataGraphShape validation
         shapes_graph_shapes_graph: Graph containing shapes for shapesGraphShape validation
-        data_graph: The data graph containing the focus node (optional for Literals)
+        data_graph: The data graph containing the focus node (required)
         constraint_shape: The SHACL shape constraining the focus node (optional)
         shapes_graph: The shapes graph containing constraint_shape (required if constraint_shape provided)
         logger: Optional logger for warnings and debug messages
@@ -60,10 +60,13 @@ def score_widgets(
         >>> widget_scoring_graph = Graph()
         >>> # ... populate graphs ...
         >>>
+        >>> # Create data graph containing the focus node
+        >>> data_graph.add((EX.someSubject, EX.someProperty, Literal(True)))
         >>> # Score widgets for a boolean value
         >>> result = score_widgets(
         ...     focus_node=Literal(True),
-        ...     widget_scoring_graph=widget_scoring_graph
+        ...     widget_scoring_graph=widget_scoring_graph,
+        ...     data_graph=data_graph
         ... )
         >>> print(result.default_widget)  # Highest-scoring widget
     """
@@ -81,9 +84,9 @@ def score_widgets(
             f"focus_node must be URIRef, BNode, or Literal, got {type(focus_node)}"
         )
 
-    # For URIRef/BNode focus nodes, require data_graph
-    if isinstance(focus_node, (URIRef, BNode)) and data_graph is None:
-        raise MissingGraphError("data_graph is required for URIRef/BNode focus nodes")
+    # data_graph is required for ALL focus node types per spec section 4.1
+    if data_graph is None:
+        raise MissingGraphError("data_graph is required for all focus nodes")
 
     # If constraint_shape provided, require shapes_graph
     if constraint_shape is not None and shapes_graph is None:
@@ -99,11 +102,9 @@ def score_widgets(
 
     for score_inst in score_instances:
         # Validate against dataGraphShapes
-        # Use empty graph for Literals without data_graph
-        dg_to_use = data_graph if data_graph is not None else Graph()
         data_valid = validate_against_shapes(
             focus_node,
-            dg_to_use,
+            data_graph,
             score_inst["dataGraphShapes"],
             data_graph_shapes_graph,
             logger,
@@ -114,11 +115,17 @@ def score_widgets(
         # shapesGraphShape conditions, the score is not applicable
         if constraint_shape is None and score_inst["shapesGraphShapes"]:
             shapes_valid = False
+        elif constraint_shape is None:
+            # No shapesGraphShape conditions, and no constraint_shape - always valid
+            shapes_valid = True
         else:
-            sg_to_use = shapes_graph if shapes_graph is not None else Graph()
+            # constraint_shape is not None, so shapes_graph must not be None
+            assert (
+                shapes_graph is not None
+            )  # Safety check - input validation ensures this
             shapes_valid = validate_against_shapes(
                 constraint_shape,
-                sg_to_use,
+                shapes_graph,
                 score_inst["shapesGraphShapes"],
                 shapes_graph_shapes_graph,
                 logger,
