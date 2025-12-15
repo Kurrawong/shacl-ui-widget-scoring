@@ -142,11 +142,15 @@ The implementation in `shui_widget_scoring/` follows this specification, and `te
 
 ## Development Workflow
 
-1. Make changes to code in `shui_widget_scoring/`
-2. Run tests: `uv run pytest`
-3. Format and lint: `task code`
-4. Verify test coverage in output
+After each change to the codebase:
+
+1. Make changes to code in `shui_widget_scoring/` or test files
+2. Run `task code` to format and lint code
+3. Run `task test` to execute the test suite and verify coverage
+4. Verify all tests pass and coverage remains adequate
 5. Update tests if adding new features
+
+These commands ensure code quality and correctness before committing changes.
 
 ## Code Style
 
