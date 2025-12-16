@@ -1,21 +1,21 @@
-export interface FocusNodeIRI {
-  type: 'IRI'
+export interface FocusNodeNamedNode {
+  termType: 'NamedNode'
   value: string
 }
 
 export interface FocusNodeLiteral {
-  type: 'LITERAL'
+  termType: 'Literal'
   value: string
   datatype?: string
   language?: string
 }
 
-export type FocusNode = FocusNodeIRI | FocusNodeLiteral
+export type FocusNode = FocusNodeNamedNode | FocusNodeLiteral
 
-export function isFocusNodeIRI(node: FocusNode): node is FocusNodeIRI {
-  return node.type === 'IRI'
+export function isFocusNodeNamedNode(node: FocusNode): node is FocusNodeNamedNode {
+  return node.termType === 'NamedNode'
 }
 
 export function isFocusNodeLiteral(node: FocusNode): node is FocusNodeLiteral {
-  return node.type === 'LITERAL'
+  return node.termType === 'Literal'
 }

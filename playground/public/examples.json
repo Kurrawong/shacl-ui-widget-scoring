@@ -12,7 +12,7 @@
       "description": "Widget scoring based only on data graph value node",
       "dataGraph": "@prefix ex: <https://example.com/> .\n@prefix schema: <https://schema.org/> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nex:user-a a schema:Person ;\n    ex:isAdmin true .\n\n",
       "focusNode": {
-        "type": "LITERAL",
+        "termType": "Literal",
         "value": "true",
         "datatype": "http://www.w3.org/2001/XMLSchema#boolean"
       },
@@ -25,7 +25,7 @@
       "description": "Widget scoring with shapes graph constraint requiring non-literal values",
       "dataGraph": "@prefix ex: <https://example.com/> .\n@prefix schema: <https://schema.org/> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nex:user-a a schema:Person ;\n    ex:company ex:CompanyA .\n\n",
       "focusNode": {
-        "type": "IRI",
+        "termType": "NamedNode",
         "value": "https://example.com/CompanyA"
       },
       "shapesGraph": "@prefix ex: <https://example.com/> .\n@prefix sh: <http://www.w3.org/ns/shacl#> .\n\nex:PersonCompanyShape a sh:PropertyShape ;\n    sh:nodeKind sh:BlankNodeOrIRI ;\n    sh:path ex:company .\n\n",
@@ -37,7 +37,7 @@
       "description": "Widget scoring with shapes graph constraint requiring date datatype",
       "dataGraph": "@prefix ex: <https://example.com/> .\n@prefix schema: <https://schema.org/> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nex:user-a a schema:Person ;\n    ex:birthDate \"1990-01-15\"^^xsd:date .\n\n",
       "focusNode": {
-        "type": "LITERAL",
+        "termType": "Literal",
         "value": "1990-01-15",
         "datatype": "http://www.w3.org/2001/XMLSchema#date"
       },

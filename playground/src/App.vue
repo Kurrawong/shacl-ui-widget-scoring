@@ -6,6 +6,7 @@ import { useExamples } from '@/composables/useExamples'
 import { usePyodide } from '@/composables/usePyodide'
 import { useSaves } from '@/composables/useSaves'
 import { useToast } from '@/composables/useToast'
+import { serializeFocusNode } from '@/lib/focusNode'
 import Header from '@/components/layout/Header.vue'
 import Toolbar from '@/components/layout/Toolbar.vue'
 import Sidebar from '@/components/layout/Sidebar.vue'
@@ -69,7 +70,7 @@ async function runScoring() {
 
   try {
     const result = await scoreWidgets({
-      focusNode: playgroundStore.focusNode,
+      focusNode: serializeFocusNode(playgroundStore.focusNode),
       widgetScoringGraph: playgroundStore.widgetScoringGraph,
       dataGraphShapes: playgroundStore.dataGraphShapes,
       shapesGraphShapes: playgroundStore.shapesGraphShapes,

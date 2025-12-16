@@ -21,12 +21,12 @@
             <div class="form-group">
               <label class="form-label">Node Type</label>
               <select v-model="nodeType" class="form-select">
-                <option value="IRI">IRI</option>
-                <option value="LITERAL">Literal</option>
+                <option value="NamedNode">IRI</option>
+                <option value="Literal">Literal</option>
               </select>
             </div>
 
-            <div v-if="nodeType === 'IRI'" class="form-group">
+            <div v-if="nodeType === 'NamedNode'" class="form-group">
               <label class="form-label">
                 IRI Value
                 <span class="field-required">*</span>
@@ -41,7 +41,7 @@
               />
             </div>
 
-            <div v-if="nodeType === 'LITERAL'" class="literal-fields">
+            <div v-if="nodeType === 'Literal'" class="literal-fields">
               <div class="form-group">
                 <label class="form-label">
                   Value
@@ -104,7 +104,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import type { FocusNode } from '@/types/focusNode'
-import { isFocusNodeIRI } from '@/types/focusNode'
+import { isFocusNodeNamedNode } from '@/types/focusNode'
 
 interface Props {
   isOpen: boolean
@@ -119,7 +119,7 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const nodeType = ref<'IRI' | 'LITERAL'>('IRI')
+const nodeType = ref<'NamedNode' | 'Literal'>('NamedNode')
 const iriValue = ref('')
 const literalValue = ref('')
 const datatype = ref('')
@@ -129,7 +129,7 @@ const iriInput = ref<HTMLInputElement | null>(null)
 const literalInput = ref<HTMLInputElement | null>(null)
 
 const canSave = computed(() => {
-  if (nodeType.value === 'IRI') {
+  if (nodeType.value === 'NamedNode') {
     return iriValue.value.trim().length > 0
   }
   return literalValue.value.trim().length > 0
@@ -140,14 +140,14 @@ const handleSave = () => {
 
   let result: FocusNode
 
-  if (nodeType.value === 'IRI') {
+  if (nodeType.value === 'NamedNode') {
     result = {
-      type: 'IRI',
+      termType: 'NamedNode',
       value: iriValue.value.trim(),
     }
   } else {
     result = {
-      type: 'LITERAL',
+      termType: 'Literal',
       value: literalValue.value.trim(),
     }
 
@@ -167,14 +167,14 @@ const close = () => {
 }
 
 const initializeForm = () => {
-  if (isFocusNodeIRI(props.initialValue)) {
-    nodeType.value = 'IRI'
+  if (isFocusNodeNamedNode(props.initialValue)) {
+    nodeType.value = 'NamedNode'
     iriValue.value = props.initialValue.value
     literalValue.value = ''
     datatype.value = ''
     language.value = ''
   } else {
-    nodeType.value = 'LITERAL'
+    nodeType.value = 'Literal'
     iriValue.value = ''
     literalValue.value = props.initialValue.value
     datatype.value = props.initialValue.datatype || ''
@@ -198,7 +198,7 @@ watch(
     if (isOpen) {
       initializeForm()
       nextTick(() => {
-        if (nodeType.value === 'IRI') {
+        if (nodeType.value === 'NamedNode') {
           iriInput.value?.focus()
         } else {
           literalInput.value?.focus()
@@ -211,7 +211,7 @@ watch(
 // Watch for node type changes to focus appropriate input
 watch(nodeType, (newType) => {
   nextTick(() => {
-    if (newType === 'IRI') {
+    if (newType === 'NamedNode') {
       iriInput.value?.focus()
     } else {
       literalInput.value?.focus()

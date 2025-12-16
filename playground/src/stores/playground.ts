@@ -11,7 +11,7 @@ export const usePlaygroundStore = defineStore('playground', () => {
   const dataGraph = ref<string>('')
   const shapesGraph = ref<string>('')
   const focusNode = ref<FocusNode>({
-    type: 'IRI',
+    termType: 'NamedNode',
     value: 'http://example.org/resource',
   })
   const constraintShape = ref<string | null>(null)
@@ -78,7 +78,7 @@ export const usePlaygroundStore = defineStore('playground', () => {
     dataGraph.value = ''
     shapesGraph.value = ''
     focusNode.value = {
-      type: 'IRI',
+      termType: 'NamedNode',
       value: 'http://example.org/resource',
     }
     constraintShape.value = null

@@ -28,7 +28,7 @@ export function useSaves() {
 
               // Create new FocusNode object (literal with datatype)
               const newFocusNode = {
-                type: 'LITERAL' as const,
+                termType: 'Literal' as const,
                 value: focusNodeValue,
                 datatype: focusNodeDatatype,
               }

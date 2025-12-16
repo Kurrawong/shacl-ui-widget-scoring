@@ -1,8 +1,8 @@
-import type { FocusNode, FocusNodeIRI, FocusNodeLiteral } from '@/types/focusNode'
-import { isFocusNodeIRI } from '@/types/focusNode'
+import type { FocusNode, FocusNodeNamedNode, FocusNodeLiteral } from '@/types/focusNode'
+import { isFocusNodeNamedNode } from '@/types/focusNode'
 
 export function focusNodeToN3String(node: FocusNode): string {
-  if (isFocusNodeIRI(node)) {
+  if (isFocusNodeNamedNode(node)) {
     return `<${node.value}>`
   }
 
@@ -19,7 +19,7 @@ export function focusNodeToN3String(node: FocusNode): string {
 }
 
 export function focusNodeToRDFLibPython(node: FocusNode): string {
-  if (isFocusNodeIRI(node)) {
+  if (isFocusNodeNamedNode(node)) {
     return `URIRef("${node.value}")`
   }
 
@@ -36,8 +36,8 @@ export function focusNodeToRDFLibPython(node: FocusNode): string {
 }
 
 export function serializeFocusNode(node: FocusNode): FocusNode {
-  // The FocusNode type is already a plain object structure, so we just return it
-  return node
+  // Create a plain object copy to ensure it's serializable for postMessage
+  return JSON.parse(JSON.stringify(node))
 }
 
 export function deserializeFocusNode(serialized: FocusNode): FocusNode {
@@ -45,9 +45,9 @@ export function deserializeFocusNode(serialized: FocusNode): FocusNode {
   return serialized
 }
 
-export function createDefaultFocusNode(): FocusNodeIRI {
+export function createDefaultFocusNode(): FocusNodeNamedNode {
   return {
-    type: 'IRI',
+    termType: 'NamedNode',
     value: 'http://example.org/resource',
   }
 }
