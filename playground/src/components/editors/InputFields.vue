@@ -1,7 +1,7 @@
 <template>
   <div class="input-fields">
     <div class="fields-header">
-      <h3 class="fields-title">Algorithm Parameters</h3>
+      <h3 class="fields-title">Input Parameters</h3>
       <p class="fields-description">Configure the focus node and its properties</p>
     </div>
 
