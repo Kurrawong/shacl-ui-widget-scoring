@@ -191,7 +191,7 @@ self.onmessage = async (event: MessageEvent) => {
 };
 
 // Handle errors
-self.onerror = (error) => {
+self.onerror = (error: ErrorEvent) => {
   self.postMessage({
     type: "error",
     error: error.message,

@@ -30,8 +30,8 @@ tasks:
       - uv build
 
   build-and-copy:
-    desc: Build the Python library and copy wheel to playground/pyodide/
+    desc: Build the Python library and copy wheel to playground/public/pyodide/
     cmds:
       - task: build
-      - mkdir -p playground/pyodide
-      - cp dist/*.whl playground/pyodide/
+      - mkdir -p playground/public/pyodide
+      - cp dist/*.whl playground/public/pyodide/
