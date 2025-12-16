@@ -15,7 +15,7 @@ export function useExamples() {
     error.value = null
 
     try {
-      const response = await fetch('/examples.json')
+      const response = await fetch(`${import.meta.env.BASE_URL}examples.json`)
       if (!response.ok) {
         throw new Error(`Failed to load examples: ${response.statusText}`)
       }
