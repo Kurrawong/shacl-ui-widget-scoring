@@ -1,5 +1,14 @@
 <template>
   <div class="editor-panel">
+    <InputFields
+      :focus-node="focusNode"
+      :focus-node-datatype="focusNodeDatatype"
+      :constraint-shape="constraintShape"
+      @update:focus-node="(value) => $emit('update:focusNode', value)"
+      @update:focus-node-datatype="(value) => $emit('update:focusNodeDatatype', value)"
+      @update:constraint-shape="(value) => $emit('update:constraintShape', value)"
+    />
+
     <div class="editor-tabs">
       <button
         v-for="tab in tabs"
@@ -92,6 +101,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import TurtleEditor from './TurtleEditor.vue'
+import InputFields from './InputFields.vue'
 
 interface Props {
   widgetScoringGraph: string
@@ -99,6 +109,9 @@ interface Props {
   shapesGraphShapes: string
   dataGraph: string
   shapesGraph: string
+  focusNode: string
+  focusNodeDatatype: string
+  constraintShape: string | null
 }
 
 interface Emits {
@@ -107,6 +120,9 @@ interface Emits {
   (e: 'update:shapesGraphShapes', value: string): void
   (e: 'update:dataGraph', value: string): void
   (e: 'update:shapesGraph', value: string): void
+  (e: 'update:focusNode', value: string): void
+  (e: 'update:focusNodeDatatype', value: string): void
+  (e: 'update:constraintShape', value: string | null): void
 }
 
 defineProps<Props>()

@@ -1,17 +1,20 @@
 <template>
   <div class="toolbar">
     <div class="toolbar-left">
-      <ExampleSelector
-        :current-example="currentExample"
-        :examples="examples"
-        @update:current-example="(id) => $emit('update:currentExample', id)"
-      />
       <button
         class="btn btn-secondary"
         :disabled="isRunning"
         @click="$emit('clearInputs')"
       >
         Clear Inputs
+      </button>
+
+      <button
+        class="btn btn-secondary"
+        :disabled="isRunning"
+        @click="$emit('save')"
+      >
+        💾 Save
       </button>
     </div>
 
@@ -37,19 +40,15 @@
 </template>
 
 <script setup lang="ts">
-import ExampleSelector from './ExampleSelector.vue'
-
 interface Props {
-  currentExample: string
-  examples: Array<{ id: string; name: string }>
   isRunning?: boolean
 }
 
 interface Emits {
-  (e: 'update:currentExample', id: string): void
   (e: 'run'): void
   (e: 'clear'): void
   (e: 'clearInputs'): void
+  (e: 'save'): void
 }
 
 withDefaults(defineProps<Props>(), {

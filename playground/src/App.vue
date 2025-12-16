@@ -4,8 +4,13 @@ import { usePlaygroundStore } from '@/stores/playground'
 import { useScoringStore } from '@/stores/scoring'
 import { useExamples } from '@/composables/useExamples'
 import { usePyodide } from '@/composables/usePyodide'
+import { useSaves } from '@/composables/useSaves'
+import { useToast } from '@/composables/useToast'
 import Header from '@/components/layout/Header.vue'
 import Toolbar from '@/components/layout/Toolbar.vue'
+import Sidebar from '@/components/layout/Sidebar.vue'
+import SaveModal from '@/components/layout/SaveModal.vue'
+import ToastContainer from '@/components/layout/ToastContainer.vue'
 import SplitPane from '@/components/layout/SplitPane.vue'
 import EditorPanel from '@/components/editors/EditorPanel.vue'
 import ResultsPanel from '@/components/results/ResultsPanel.vue'
@@ -15,29 +20,41 @@ const playgroundStore = usePlaygroundStore()
 const scoringStore = useScoringStore()
 const { examples, sharedGraphs, loadExamples } = useExamples()
 const { scoreWidgets, isInitializing, error: pyodideError } = usePyodide()
+const { saves, activeSaveId, hasSaves, createSave, updateSave, deleteSave, getSave } = useSaves()
+const { success, error: showError } = useToast()
 
-const currentExampleId = ref('example1')
+const sidebarOpen = ref(true)
+const saveModalOpen = ref(false)
 
 // Initialize on mount
 onMounted(async () => {
   try {
     await loadExamples()
-    if (examples.value.length > 0) {
-      loadExample(examples.value[0].id)
+
+    // Pre-populate localStorage with examples if no saves exist
+    if (!hasSaves.value && examples.value.length > 0 && sharedGraphs.value) {
+      examples.value.forEach((example) => {
+        createSave(example.name, {
+          widgetScoringGraph: sharedGraphs.value!.widgetScoringGraph,
+          dataGraphShapes: sharedGraphs.value!.dataGraphShapes,
+          shapesGraphShapes: sharedGraphs.value!.shapesGraphShapes,
+          dataGraph: example.dataGraph,
+          shapesGraph: example.shapesGraph || '',
+          focusNode: example.focusNode,
+          focusNodeDatatype: example.focusNodeDatatype,
+          constraintShape: example.constraintShape,
+        })
+      })
+    }
+
+    // Load the first save if available
+    if (saves.value.length > 0) {
+      loadSave(saves.value[0].id)
     }
   } catch (err) {
-    console.error('Failed to load examples:', err)
+    console.error('Failed to initialize:', err)
   }
 })
-
-// Load example into stores
-function loadExample(exampleId: string) {
-  const example = examples.value.find((ex) => ex.id === exampleId)
-  if (example && sharedGraphs.value) {
-    playgroundStore.loadExample(example, sharedGraphs.value)
-    currentExampleId.value = exampleId
-  }
-}
 
 // Run scoring
 async function runScoring() {
@@ -83,12 +100,69 @@ function clearResults() {
 // Clear all inputs
 function clearInputs() {
   playgroundStore.clear()
+  activeSaveId.value = null
 }
 
-// Watch for example changes
-watch(currentExampleId, (newId) => {
-  loadExample(newId)
-})
+// Load a saved configuration
+function loadSave(saveId: string) {
+  const save = getSave(saveId)
+  if (save) {
+    playgroundStore.setWidgetScoringGraph(save.widgetScoringGraph)
+    playgroundStore.setDataGraphShapes(save.dataGraphShapes)
+    playgroundStore.setShapesGraphShapes(save.shapesGraphShapes)
+    playgroundStore.setDataGraph(save.dataGraph)
+    playgroundStore.setShapesGraph(save.shapesGraph || '')
+    playgroundStore.setFocusNode(save.focusNode)
+    playgroundStore.setFocusNodeDatatype(save.focusNodeDatatype)
+    playgroundStore.setConstraintShape(save.constraintShape)
+    activeSaveId.value = saveId
+    success(`Loaded: ${save.name}`)
+  }
+}
+
+// Open save modal
+function openSaveModal() {
+  saveModalOpen.value = true
+}
+
+// Handle save from modal
+function handleSave(name: string, overwriteId?: string) {
+  try {
+    const config = {
+      widgetScoringGraph: playgroundStore.widgetScoringGraph,
+      dataGraphShapes: playgroundStore.dataGraphShapes,
+      shapesGraphShapes: playgroundStore.shapesGraphShapes,
+      dataGraph: playgroundStore.dataGraph,
+      shapesGraph: playgroundStore.shapesGraph,
+      focusNode: playgroundStore.focusNode,
+      focusNodeDatatype: playgroundStore.focusNodeDatatype,
+      constraintShape: playgroundStore.constraintShape,
+    }
+
+    if (overwriteId) {
+      updateSave(overwriteId, config)
+      activeSaveId.value = overwriteId
+      success(`Updated: ${name}`)
+    } else {
+      const newSave = createSave(name, config)
+      activeSaveId.value = newSave.id
+      success(`Saved: ${name}`)
+    }
+
+    saveModalOpen.value = false
+  } catch (err) {
+    showError(`Failed to save: ${err}`)
+  }
+}
+
+// Handle delete save
+function handleDeleteSave(saveId: string) {
+  const save = getSave(saveId)
+  if (save && confirm(`Delete "${save.name}"? This cannot be undone.`)) {
+    deleteSave(saveId)
+    success(`Deleted: ${save.name}`)
+  }
+}
 </script>
 
 <template>
@@ -96,47 +170,70 @@ watch(currentExampleId, (newId) => {
     <Header />
 
     <Toolbar
-      :current-example="currentExampleId"
-      :examples="examples.map((ex) => ({ id: ex.id, name: ex.name }))"
       :is-running="scoringStore.isRunning"
-      @update:current-example="loadExample"
       @run="runScoring"
       @clear="clearResults"
       @clear-inputs="clearInputs"
+      @save="openSaveModal"
     />
 
     <div class="main-container">
-      <SplitPane>
-        <template #left>
-          <EditorPanel
-            :widget-scoring-graph="playgroundStore.widgetScoringGraph"
-            :data-graph-shapes="playgroundStore.dataGraphShapes"
-            :shapes-graph-shapes="playgroundStore.shapesGraphShapes"
-            :data-graph="playgroundStore.dataGraph"
-            :shapes-graph="playgroundStore.shapesGraph"
-            @update:widget-scoring-graph="(value) => playgroundStore.setWidgetScoringGraph(value)"
-            @update:data-graph-shapes="(value) => playgroundStore.setDataGraphShapes(value)"
-            @update:shapes-graph-shapes="(value) => playgroundStore.setShapesGraphShapes(value)"
-            @update:data-graph="(value) => playgroundStore.setDataGraph(value)"
-            @update:shapes-graph="(value) => playgroundStore.setShapesGraph(value)"
-          />
-        </template>
+      <Sidebar
+        v-model:is-open="sidebarOpen"
+        :saves="saves"
+        :active-save-id="activeSaveId"
+        @load="loadSave"
+        @delete="handleDeleteSave"
+      />
 
-        <template #right>
-          <ResultsPanel
-            :result="scoringStore.result"
-            :is-running="scoringStore.isRunning"
-            :is-error="scoringStore.isError"
-            :error-message="scoringStore.errorMessage"
-            :current-step="scoringStore.currentStep"
-            :is-initializing="scoringStore.isInitializingPyodide"
-            @clear="clearResults"
-          />
-        </template>
-      </SplitPane>
+      <div class="content-area">
+        <SplitPane>
+          <template #left>
+            <EditorPanel
+              :widget-scoring-graph="playgroundStore.widgetScoringGraph"
+              :data-graph-shapes="playgroundStore.dataGraphShapes"
+              :shapes-graph-shapes="playgroundStore.shapesGraphShapes"
+              :data-graph="playgroundStore.dataGraph"
+              :shapes-graph="playgroundStore.shapesGraph"
+              :focus-node="playgroundStore.focusNode"
+              :focus-node-datatype="playgroundStore.focusNodeDatatype"
+              :constraint-shape="playgroundStore.constraintShape"
+              @update:widget-scoring-graph="(value) => playgroundStore.setWidgetScoringGraph(value)"
+              @update:data-graph-shapes="(value) => playgroundStore.setDataGraphShapes(value)"
+              @update:shapes-graph-shapes="(value) => playgroundStore.setShapesGraphShapes(value)"
+              @update:data-graph="(value) => playgroundStore.setDataGraph(value)"
+              @update:shapes-graph="(value) => playgroundStore.setShapesGraph(value)"
+              @update:focus-node="(value) => playgroundStore.setFocusNode(value)"
+              @update:focus-node-datatype="(value) => playgroundStore.setFocusNodeDatatype(value)"
+              @update:constraint-shape="(value) => playgroundStore.setConstraintShape(value)"
+            />
+          </template>
+
+          <template #right>
+            <ResultsPanel
+              :result="scoringStore.result"
+              :is-running="scoringStore.isRunning"
+              :is-error="scoringStore.isError"
+              :error-message="scoringStore.errorMessage"
+              :current-step="scoringStore.currentStep"
+              :is-initializing="scoringStore.isInitializingPyodide"
+              @clear="clearResults"
+            />
+          </template>
+        </SplitPane>
+      </div>
     </div>
 
     <Footer />
+
+    <SaveModal
+      :is-open="saveModalOpen"
+      :existing-saves="saves"
+      @close="saveModalOpen = false"
+      @save="handleSave"
+    />
+
+    <ToastContainer />
   </div>
 </template>
 
@@ -171,6 +268,12 @@ body {
 }
 
 .main-container {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.content-area {
   flex: 1;
   overflow: hidden;
 }

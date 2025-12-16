@@ -24,9 +24,6 @@
 
     <!-- Results Display -->
     <div v-else class="results-content">
-      <!-- Default Widget -->
-      <DefaultWidget v-if="result.defaultWidget" :widget="result.defaultWidget" :score="result.defaultScore" :widget-scores="result.widgetScores" />
-
       <!-- Score List -->
       <ScoreList :widget-scores="result.widgetScores" />
 
@@ -41,7 +38,6 @@
 
 <script setup lang="ts">
 import type { ScoringResult } from '@/types/scoring'
-import DefaultWidget from './DefaultWidget.vue'
 import ScoreList from './ScoreList.vue'
 import StepVisualization from './StepVisualization.vue'
 
