@@ -103,6 +103,7 @@ class TestSpecCompliance(unittest.TestCase):
             widget_scoring_graph=self.scoring_graph,
             data_graph_shapes_graph=self.scoring_graph,
             shapes_graph_shapes_graph=self.scoring_graph,
+            data_graph=Graph(),
             constraint_shape=EX.MyPropShape,
             shapes_graph=self.shapes_graph,
         )
@@ -159,6 +160,7 @@ class TestEdgeCases(unittest.TestCase):
             widget_scoring_graph=self.scoring_graph,
             data_graph_shapes_graph=self.scoring_graph,
             shapes_graph_shapes_graph=self.scoring_graph,
+            data_graph=Graph(),
         )
 
         self.assertEqual(len(result.widget_scores), 2)
@@ -177,6 +179,7 @@ class TestEdgeCases(unittest.TestCase):
             widget_scoring_graph=self.scoring_graph,
             data_graph_shapes_graph=self.scoring_graph,
             shapes_graph_shapes_graph=self.scoring_graph,
+            data_graph=Graph(),
         )
         self.assertEqual(len(result.widget_scores), 1)
         self.assertEqual(result.default_score, Decimal("0"))
@@ -198,6 +201,7 @@ class TestEdgeCases(unittest.TestCase):
             widget_scoring_graph=self.scoring_graph,
             data_graph_shapes_graph=self.scoring_graph,
             shapes_graph_shapes_graph=self.scoring_graph,
+            data_graph=Graph(),
         )
 
         # Both scores should be returned
@@ -235,6 +239,7 @@ class TestEdgeCases(unittest.TestCase):
             widget_scoring_graph=self.scoring_graph,
             data_graph_shapes_graph=self.scoring_graph,
             shapes_graph_shapes_graph=self.scoring_graph,
+            data_graph=Graph(),
             constraint_shape=constraint_shape,
             shapes_graph=self.shapes_graph,
         )
@@ -250,6 +255,7 @@ class TestEdgeCases(unittest.TestCase):
             widget_scoring_graph=self.scoring_graph,
             data_graph_shapes_graph=self.scoring_graph,
             shapes_graph_shapes_graph=self.scoring_graph,
+            data_graph=Graph(),
             constraint_shape=constraint_shape_bad,
             shapes_graph=self.shapes_graph,
         )
@@ -293,6 +299,7 @@ class TestEdgeCases(unittest.TestCase):
             widget_scoring_graph=self.scoring_graph,
             data_graph_shapes_graph=self.scoring_graph,
             shapes_graph_shapes_graph=self.scoring_graph,
+            data_graph=Graph(),
             constraint_shape=constraint_shape,
             shapes_graph=self.shapes_graph,
         )
@@ -311,6 +318,7 @@ class TestEdgeCases(unittest.TestCase):
             widget_scoring_graph=self.scoring_graph,
             data_graph_shapes_graph=self.scoring_graph,
             shapes_graph_shapes_graph=self.scoring_graph,
+            data_graph=Graph(),
             constraint_shape=constraint_shape_bad,
             shapes_graph=self.shapes_graph,
         )
