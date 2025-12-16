@@ -35,8 +35,8 @@ async function initWorker(): Promise<void> {
 
       worker?.addEventListener('message', handler)
 
-      // Send init message
-      worker?.postMessage({ type: 'init' })
+      // Send init message with BASE_URL
+      worker?.postMessage({ type: 'init', baseURL: import.meta.env.BASE_URL })
 
       // Timeout after 30 seconds
       setTimeout(() => {

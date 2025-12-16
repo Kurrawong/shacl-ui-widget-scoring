@@ -5,6 +5,7 @@ import { focusNodeToRDFLibPython, focusNodeToN3String } from "@/lib/focusNode";
 
 let pyodide: any = null;
 let isInitialized = false;
+let baseURL = "";
 
 // Initialize Pyodide
 async function initPyodide() {
@@ -24,9 +25,9 @@ async function initPyodide() {
     // Install rdflib and pyshacl
     await micropip.install(["rdflib", "pyshacl"]);
 
-    // Install the wheel from public folder
-    // Note: Adjust the path based on your deployment setup
-    await micropip.install("/pyodide/shui_widget_score-0.1.0-py3-none-any.whl");
+    // Install the wheel from public folder using the baseURL
+    const wheelURL = `${baseURL}pyodide/shui_widget_score-0.1.0-py3-none-any.whl`;
+    await micropip.install(wheelURL);
 
     isInitialized = true;
     self.postMessage({ type: "initialized" });
@@ -168,10 +169,14 @@ output
 
 // Message handler
 self.onmessage = async (event: MessageEvent) => {
-  const { type, payload } = event.data;
+  const { type, payload, baseURL: messageBaseURL } = event.data;
 
   try {
     if (type === "init") {
+      // Store baseURL for use in initPyodide
+      if (messageBaseURL) {
+        baseURL = messageBaseURL;
+      }
       await initPyodide();
     } else if (type === "score") {
       const result = await scoreWidgets(payload as ScoringRequest);
