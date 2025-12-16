@@ -2,6 +2,8 @@
  * TypeScript types for SHUI Widget Scoring
  */
 
+import type { FocusNode } from './focusNode'
+
 export interface WidgetScore {
   widget: string
   score: number
@@ -49,8 +51,7 @@ export interface PyodideMessage {
 }
 
 export interface ScoringRequest {
-  focusNode: string
-  focusNodeDatatype: string
+  focusNode: FocusNode
   widgetScoringGraph: string
   dataGraphShapes: string
   shapesGraphShapes: string

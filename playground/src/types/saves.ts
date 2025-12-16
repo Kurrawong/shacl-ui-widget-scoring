@@ -2,6 +2,8 @@
  * TypeScript types for Save System
  */
 
+import type { FocusNode } from './focusNode'
+
 export interface SavedConfiguration {
   id: string
   name: string
@@ -11,8 +13,7 @@ export interface SavedConfiguration {
   shapesGraphShapes: string
   dataGraph: string
   shapesGraph: string | null
-  focusNode: string
-  focusNodeDatatype: string
+  focusNode: FocusNode
   constraintShape: string | null
 }
 

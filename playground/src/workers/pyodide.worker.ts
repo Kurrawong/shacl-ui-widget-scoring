@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 
 import type { ScoringRequest, ScoringResult } from "@/types/scoring";
+import { focusNodeToRDFLibPython, focusNodeToN3String } from "@/lib/focusNode";
 
 let pyodide: any = null;
 let isInitialized = false;
@@ -63,20 +64,7 @@ shapes_graph_shapes.parse(data="""${
   }""", format="turtle")
 
 # Parse focus node
-focus_node_str = """${request.focusNode}"""
-focus_node_datatype = """${request.focusNodeDatatype}"""
-
-# Create appropriate RDFLib node type based on datatype
-if focus_node_datatype == "http://www.w3.org/2001/XMLSchema#boolean":
-    focus_node = Literal(focus_node_str.lower() == 'true', datatype=URIRef(focus_node_datatype))
-elif focus_node_datatype == "http://www.w3.org/2001/XMLSchema#integer":
-    focus_node = Literal(int(focus_node_str), datatype=URIRef(focus_node_datatype))
-elif focus_node_datatype == "http://www.w3.org/2001/XMLSchema#decimal":
-    focus_node = Literal(float(focus_node_str), datatype=URIRef(focus_node_datatype))
-elif focus_node_datatype == "http://www.w3.org/2001/XMLSchema#date":
-    focus_node = Literal(focus_node_str, datatype=URIRef(focus_node_datatype))
-else:
-    focus_node = Literal(focus_node_str, datatype=URIRef(focus_node_datatype))
+focus_node = ${focusNodeToRDFLibPython(request.focusNode)}
 
 # Prepare kwargs
 kwargs = {
@@ -163,7 +151,7 @@ output = {
     'defaultWidget': str(result.default_widget) if result.default_widget else None,
     'defaultScore': int(result.default_score) if result.default_score else None,
     'executionSteps': [],
-    'focusNode': focus_node_str,
+    'focusNode': """${focusNodeToN3String(request.focusNode)}""",
     'constraintShape': """${request.constraintShape || ""}""" or None,
 }
 

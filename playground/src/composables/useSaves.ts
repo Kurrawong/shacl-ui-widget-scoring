@@ -19,7 +19,31 @@ export function useSaves() {
       if (stored) {
         const data: SavesData = JSON.parse(stored)
         if (data.version === STORAGE_VERSION) {
-          saves.value = data.saves.sort((a, b) => b.timestamp - a.timestamp)
+          // Migrate old saves with focusNode/focusNodeDatatype strings to new FocusNode structure
+          const migratedSaves = data.saves.map((save: any) => {
+            if (typeof save.focusNode === 'string') {
+              // Old format: separate focusNode and focusNodeDatatype
+              const focusNodeDatatype = save.focusNodeDatatype
+              const focusNodeValue = save.focusNode
+
+              // Create new FocusNode object (literal with datatype)
+              const newFocusNode = {
+                type: 'LITERAL' as const,
+                value: focusNodeValue,
+                datatype: focusNodeDatatype,
+              }
+
+              // Remove old focusNodeDatatype field and replace focusNode
+              const { focusNodeDatatype: _, ...rest } = save
+              return {
+                ...rest,
+                focusNode: newFocusNode,
+              }
+            }
+            return save
+          })
+
+          saves.value = migratedSaves.sort((a, b) => b.timestamp - a.timestamp)
         }
       }
     } catch (error) {

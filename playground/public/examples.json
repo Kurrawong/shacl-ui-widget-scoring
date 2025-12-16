@@ -11,8 +11,11 @@
       "name": "Data Graph Only",
       "description": "Widget scoring based only on data graph value node",
       "dataGraph": "@prefix ex: <https://example.com/> .\n@prefix schema: <https://schema.org/> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nex:user-a a schema:Person ;\n    ex:isAdmin true .\n\n",
-      "focusNode": "true",
-      "focusNodeDatatype": "http://www.w3.org/2001/XMLSchema#boolean",
+      "focusNode": {
+        "type": "LITERAL",
+        "value": "true",
+        "datatype": "http://www.w3.org/2001/XMLSchema#boolean"
+      },
       "shapesGraph": null,
       "constraintShape": null
     },
@@ -20,21 +23,26 @@
       "id": "example2",
       "name": "Data Graph + Shapes Graph (Non-literal Constraint)",
       "description": "Widget scoring with shapes graph constraint requiring non-literal values",
-      "dataGraph": "@prefix ex: <https://example.com/> .\n@prefix schema: <https://schema.org/> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nex:user-a a schema:Person ;\n    ex:isAdmin true .\n\n",
-      "focusNode": "true",
-      "focusNodeDatatype": "http://www.w3.org/2001/XMLSchema#boolean",
-      "shapesGraph": "@prefix ex: <https://example.com/> .\n@prefix sh: <http://www.w3.org/ns/shacl#> .\n\nex:PersonIsAdminShape a sh:PropertyShape ;\n    sh:nodeKind sh:BlankNodeOrIRI ;\n    sh:path ex:isAdmin .\n\n",
-      "constraintShape": "https://example.com/PersonIsAdminShape"
+      "dataGraph": "@prefix ex: <https://example.com/> .\n@prefix schema: <https://schema.org/> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nex:user-a a schema:Person ;\n    ex:company ex:CompanyA .\n\n",
+      "focusNode": {
+        "type": "IRI",
+        "value": "https://example.com/CompanyA"
+      },
+      "shapesGraph": "@prefix ex: <https://example.com/> .\n@prefix sh: <http://www.w3.org/ns/shacl#> .\n\nex:PersonCompanyShape a sh:PropertyShape ;\n    sh:nodeKind sh:BlankNodeOrIRI ;\n    sh:path ex:company .\n\n",
+      "constraintShape": "https://example.com/PersonCompanyShape"
     },
     {
       "id": "example3",
       "name": "Data Graph + Shapes Graph (Date Constraint)",
       "description": "Widget scoring with shapes graph constraint requiring date datatype",
-      "dataGraph": "@prefix ex: <https://example.com/> .\n@prefix schema: <https://schema.org/> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nex:user-a a schema:Person ;\n    ex:isAdmin true .\n\n",
-      "focusNode": "true",
-      "focusNodeDatatype": "http://www.w3.org/2001/XMLSchema#boolean",
-      "shapesGraph": "@prefix ex: <https://example.com/> .\n@prefix sh: <http://www.w3.org/ns/shacl#> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nex:PersonIsAdminShape a sh:PropertyShape ;\n    sh:datatype xsd:date ;\n    sh:path ex:isAdmin .\n\n",
-      "constraintShape": "https://example.com/PersonIsAdminShape"
+      "dataGraph": "@prefix ex: <https://example.com/> .\n@prefix schema: <https://schema.org/> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nex:user-a a schema:Person ;\n    ex:birthDate \"1990-01-15\"^^xsd:date .\n\n",
+      "focusNode": {
+        "type": "LITERAL",
+        "value": "1990-01-15",
+        "datatype": "http://www.w3.org/2001/XMLSchema#date"
+      },
+      "shapesGraph": "@prefix ex: <https://example.com/> .\n@prefix sh: <http://www.w3.org/ns/shacl#> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n\nex:PersonBirthDateShape a sh:PropertyShape ;\n    sh:datatype xsd:date ;\n    sh:path ex:birthDate .\n\n",
+      "constraintShape": "https://example.com/PersonBirthDateShape"
     }
   ]
 }

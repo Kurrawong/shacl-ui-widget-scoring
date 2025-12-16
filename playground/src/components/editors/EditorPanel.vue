@@ -2,10 +2,8 @@
   <div class="editor-panel">
     <InputFields
       :focus-node="focusNode"
-      :focus-node-datatype="focusNodeDatatype"
       :constraint-shape="constraintShape"
       @update:focus-node="(value) => $emit('update:focusNode', value)"
-      @update:focus-node-datatype="(value) => $emit('update:focusNodeDatatype', value)"
       @update:constraint-shape="(value) => $emit('update:constraintShape', value)"
     />
 
@@ -100,6 +98,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { FocusNode } from '@/types/focusNode'
 import TurtleEditor from './TurtleEditor.vue'
 import InputFields from './InputFields.vue'
 
@@ -109,8 +108,7 @@ interface Props {
   shapesGraphShapes: string
   dataGraph: string
   shapesGraph: string
-  focusNode: string
-  focusNodeDatatype: string
+  focusNode: FocusNode
   constraintShape: string | null
 }
 
@@ -120,8 +118,7 @@ interface Emits {
   (e: 'update:shapesGraphShapes', value: string): void
   (e: 'update:dataGraph', value: string): void
   (e: 'update:shapesGraph', value: string): void
-  (e: 'update:focusNode', value: string): void
-  (e: 'update:focusNodeDatatype', value: string): void
+  (e: 'update:focusNode', value: FocusNode): void
   (e: 'update:constraintShape', value: string | null): void
 }
 

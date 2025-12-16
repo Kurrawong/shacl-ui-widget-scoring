@@ -11,31 +11,17 @@
           Focus Node
           <span class="field-required">*</span>
         </label>
-        <input
-          id="focus-node"
-          type="text"
-          class="field-input"
-          :value="focusNode"
-          @input="$emit('update:focusNode', ($event.target as HTMLInputElement).value)"
-          placeholder="e.g., true, ex:Resource1"
-        />
-        <p class="field-hint">The RDF value node to be scored (literal or URI)</p>
-      </div>
-
-      <div class="field-group">
-        <label class="field-label" for="focus-node-datatype">
-          Focus Node Datatype
-          <span class="field-required">*</span>
-        </label>
-        <input
-          id="focus-node-datatype"
-          type="text"
-          class="field-input"
-          :value="focusNodeDatatype"
-          @input="$emit('update:focusNodeDatatype', ($event.target as HTMLInputElement).value)"
-          placeholder="e.g., http://www.w3.org/2001/XMLSchema#boolean"
-        />
-        <p class="field-hint">XSD datatype URI for the focus node</p>
+        <div
+          class="field-input field-input-clickable"
+          @click="showModal = true"
+          role="button"
+          tabindex="0"
+          @keydown.enter="showModal = true"
+          @keydown.space.prevent="showModal = true"
+        >
+          {{ displayValue }}
+        </div>
+        <p class="field-hint">Click to edit the RDF value node (IRI or literal)</p>
       </div>
 
       <div class="field-group">
@@ -59,24 +45,43 @@
         <p class="field-hint">Optional SHACL shape URI to validate the focus node against</p>
       </div>
     </div>
+
+    <FocusNodeModal
+      :is-open="showModal"
+      :initial-value="focusNode"
+      @close="showModal = false"
+      @save="handleSave"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from 'vue'
+import type { FocusNode } from '@/types/focusNode'
+import { focusNodeToN3String } from '@/lib/focusNode'
+import FocusNodeModal from './FocusNodeModal.vue'
+
 interface Props {
-  focusNode: string
-  focusNodeDatatype: string
+  focusNode: FocusNode
   constraintShape: string | null
 }
 
 interface Emits {
-  (e: 'update:focusNode', value: string): void
-  (e: 'update:focusNodeDatatype', value: string): void
+  (e: 'update:focusNode', value: FocusNode): void
   (e: 'update:constraintShape', value: string | null): void
 }
 
-defineProps<Props>()
-defineEmits<Emits>()
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
+
+const showModal = ref(false)
+
+const displayValue = computed(() => focusNodeToN3String(props.focusNode))
+
+const handleSave = (value: FocusNode) => {
+  emit('update:focusNode', value)
+  showModal.value = false
+}
 </script>
 
 <style scoped>
@@ -154,6 +159,21 @@ defineEmits<Emits>()
 
 .field-input::placeholder {
   color: #858585;
+}
+
+.field-input-clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.field-input-clickable:hover {
+  border-color: #007acc;
+  background: #252526;
+}
+
+.field-input-clickable:focus {
+  outline: 2px solid #007acc;
+  outline-offset: 2px;
 }
 
 .field-hint {

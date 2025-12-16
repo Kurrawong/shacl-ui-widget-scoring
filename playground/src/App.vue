@@ -42,7 +42,6 @@ onMounted(async () => {
           dataGraph: example.dataGraph,
           shapesGraph: example.shapesGraph || '',
           focusNode: example.focusNode,
-          focusNodeDatatype: example.focusNodeDatatype,
           constraintShape: example.constraintShape,
         })
       })
@@ -69,13 +68,8 @@ async function runScoring() {
   }, { immediate: true })
 
   try {
-    // Parse focus node based on datatype
-    const focusNode = playgroundStore.focusNode
-    const focusNodeDatatype = playgroundStore.focusNodeDatatype
-
     const result = await scoreWidgets({
-      focusNode,
-      focusNodeDatatype,
+      focusNode: playgroundStore.focusNode,
       widgetScoringGraph: playgroundStore.widgetScoringGraph,
       dataGraphShapes: playgroundStore.dataGraphShapes,
       shapesGraphShapes: playgroundStore.shapesGraphShapes,
@@ -114,7 +108,6 @@ function loadSave(saveId: string) {
     playgroundStore.setDataGraph(save.dataGraph)
     playgroundStore.setShapesGraph(save.shapesGraph || '')
     playgroundStore.setFocusNode(save.focusNode)
-    playgroundStore.setFocusNodeDatatype(save.focusNodeDatatype)
     playgroundStore.setConstraintShape(save.constraintShape)
     activeSaveId.value = saveId
     success(`Loaded: ${save.name}`)
@@ -136,7 +129,6 @@ function handleSave(name: string, overwriteId?: string) {
       dataGraph: playgroundStore.dataGraph,
       shapesGraph: playgroundStore.shapesGraph,
       focusNode: playgroundStore.focusNode,
-      focusNodeDatatype: playgroundStore.focusNodeDatatype,
       constraintShape: playgroundStore.constraintShape,
     }
 
@@ -197,7 +189,6 @@ function handleDeleteSave(saveId: string) {
               :data-graph="playgroundStore.dataGraph"
               :shapes-graph="playgroundStore.shapesGraph"
               :focus-node="playgroundStore.focusNode"
-              :focus-node-datatype="playgroundStore.focusNodeDatatype"
               :constraint-shape="playgroundStore.constraintShape"
               @update:widget-scoring-graph="(value) => playgroundStore.setWidgetScoringGraph(value)"
               @update:data-graph-shapes="(value) => playgroundStore.setDataGraphShapes(value)"
@@ -205,7 +196,6 @@ function handleDeleteSave(saveId: string) {
               @update:data-graph="(value) => playgroundStore.setDataGraph(value)"
               @update:shapes-graph="(value) => playgroundStore.setShapesGraph(value)"
               @update:focus-node="(value) => playgroundStore.setFocusNode(value)"
-              @update:focus-node-datatype="(value) => playgroundStore.setFocusNodeDatatype(value)"
               @update:constraint-shape="(value) => playgroundStore.setConstraintShape(value)"
             />
           </template>

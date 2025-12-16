@@ -2,13 +2,14 @@
  * TypeScript types for Examples
  */
 
+import type { FocusNode } from './focusNode'
+
 export interface Example {
   id: string
   name: string
   description: string
   dataGraph: string
-  focusNode: string
-  focusNodeDatatype: string
+  focusNode: FocusNode
   shapesGraph: string | null
   constraintShape: string | null
 }
