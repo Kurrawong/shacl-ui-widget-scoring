@@ -64,10 +64,11 @@ defineEmits<Emits>()
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: 14px 20px;
   background: #252526;
   border-bottom: 1px solid #3e3e42;
-  gap: 12px;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .toolbar-left,
@@ -78,35 +79,56 @@ defineEmits<Emits>()
 }
 
 .btn {
-  padding: 8px 12px;
+  padding: 9px 16px;
   border: none;
-  border-radius: 4px;
-  background: #0e639c;
+  border-radius: 5px;
+  background: #007acc;
   color: #ffffff;
   cursor: pointer;
   font-size: 13px;
-  transition: all 0.2s;
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .btn:hover:not(:disabled) {
   background: #1177bb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 .btn-secondary {
-  background: #6f42c1;
+  background: #3e3e42;
+  color: #cccccc;
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #7d4fc4;
+  background: #4e4e52;
 }
 
 .btn-primary {
   font-weight: 600;
+  background: linear-gradient(135deg, #007acc 0%, #005a9e 100%);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1177bb 0%, #006bb0 100%);
+}
+
+.btn-primary:focus-visible {
+  outline: 2px solid #007acc;
+  outline-offset: 2px;
 }
 </style>

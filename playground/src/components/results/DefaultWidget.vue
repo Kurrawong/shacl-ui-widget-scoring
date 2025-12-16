@@ -66,57 +66,89 @@ function getShapeName(shape: string): string {
 .widget-card {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px;
-  background: linear-gradient(135deg, #007acc 0%, #004b7a 100%);
-  border-radius: 8px;
+  gap: 20px;
+  padding: 28px;
+  background: linear-gradient(135deg, #007acc 0%, #005a9e 100%);
+  border-radius: 12px;
   color: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 122, 204, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  position: relative;
+  overflow: hidden;
+}
+
+.widget-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top right, rgba(78, 201, 176, 0.2) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 .widget-icon {
-  font-size: 48px;
+  font-size: 56px;
   flex-shrink: 0;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  animation: pulse 3s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .widget-info {
   flex: 1;
+  z-index: 1;
 }
 
 .widget-info h2 {
   margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  opacity: 0.9;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.85;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 .widget-name {
-  margin: 8px 0 4px 0;
-  font-size: 24px;
-  font-weight: bold;
+  margin: 10px 0 6px 0;
+  font-size: 28px;
+  font-weight: 700;
   word-break: break-word;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  line-height: 1.2;
 }
 
 .widget-score {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   opacity: 0.95;
+  font-weight: 500;
 }
 
 .widget-score strong {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
+  color: #4ec9b0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .widget-score-uri {
-  margin: 8px 0 0 0;
+  margin: 10px 0 0 0;
   font-size: 12px;
   display: flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
   flex-wrap: wrap;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .widget-score-uri .label {
@@ -127,16 +159,19 @@ function getShapeName(shape: string): string {
 .widget-score-uri .uri {
   font-family: 'Monaco', 'Menlo', monospace;
   font-size: 11px;
+  background: rgba(0, 0, 0, 0.15);
+  padding: 3px 7px;
+  border-radius: 4px;
 }
 
 .widget-shapes {
-  margin: 6px 0 0 0;
+  margin: 8px 0 0 0;
   font-size: 12px;
   display: flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
   flex-wrap: wrap;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .widget-shapes .label {
@@ -146,15 +181,17 @@ function getShapeName(shape: string): string {
 
 .shapes-list {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .shape-tag {
-  background: rgba(255, 255, 255, 0.15);
-  padding: 2px 6px;
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
   font-family: 'Monaco', 'Menlo', monospace;
-  font-size: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 </style>

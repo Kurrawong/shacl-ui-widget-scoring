@@ -6,8 +6,12 @@
         :key="tab.id"
         :class="['tab', { active: activeTab === tab.id }]"
         @click="activeTab = tab.id"
+        :aria-label="`Switch to ${tab.label}`"
+        :aria-selected="activeTab === tab.id"
+        role="tab"
       >
-        {{ tab.label }}
+        <span class="tab-icon">{{ tab.icon }}</span>
+        <span class="tab-label">{{ tab.label }}</span>
       </button>
     </div>
 
@@ -111,11 +115,11 @@ defineEmits<Emits>()
 const activeTab = ref('data-graph')
 
 const tabs = [
-  { id: 'widget-scoring', label: 'Widget Scoring' },
-  { id: 'data-graph-shapes', label: 'Data Graph Shapes' },
-  { id: 'shapes-graph-shapes', label: 'Shapes Graph Shapes' },
-  { id: 'data-graph', label: 'Data Graph' },
-  { id: 'shapes-graph', label: 'Shapes Graph' },
+  { id: 'widget-scoring', label: 'Widget Scoring', icon: '🎯' },
+  { id: 'data-graph-shapes', label: 'Data Graph Shapes', icon: '📋' },
+  { id: 'shapes-graph-shapes', label: 'Shapes Graph Shapes', icon: '📐' },
+  { id: 'data-graph', label: 'Data Graph', icon: '📊' },
+  { id: 'shapes-graph', label: 'Shapes Graph', icon: '🔷' },
 ]
 </script>
 
@@ -132,33 +136,71 @@ const tabs = [
 
 .editor-tabs {
   display: flex;
-  gap: 0;
+  gap: 4px;
   background: #252526;
   border-bottom: 1px solid #3e3e42;
   overflow-x: auto;
+  padding: 4px 8px 0 8px;
 }
 
 .tab {
   flex-shrink: 0;
-  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
   border: none;
-  background: #252526;
-  color: #cccccc;
+  background: transparent;
+  color: #858585;
   cursor: pointer;
   font-size: 13px;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
+  border-radius: 6px 6px 0 0;
+  position: relative;
+}
+
+.tab-icon {
+  font-size: 14px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.tab-label {
+  font-weight: 500;
 }
 
 .tab:hover {
   background: #2d2d30;
-  color: #eeeeee;
+  color: #cccccc;
+}
+
+.tab:hover .tab-icon {
+  opacity: 1;
 }
 
 .tab.active {
   background: #1e1e1e;
   color: #ffffff;
-  border-bottom: 2px solid #007acc;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #007acc 0%, #4ec9b0 100%);
+}
+
+.tab.active .tab-icon {
+  opacity: 1;
+}
+
+.tab:focus-visible {
+  outline: 2px solid #007acc;
+  outline-offset: -2px;
 }
 
 .editor-content {

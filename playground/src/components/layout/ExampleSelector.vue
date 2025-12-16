@@ -32,38 +32,44 @@ defineEmits<Emits>()
 .example-selector {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 label {
   color: #cccccc;
   font-size: 13px;
+  font-weight: 500;
   white-space: nowrap;
 }
 
 select {
-  padding: 6px 8px;
+  padding: 8px 12px;
   border: 1px solid #3e3e42;
   background: #3c3c3c;
-  color: #cccccc;
-  border-radius: 4px;
+  color: #ffffff;
+  border-radius: 5px;
   font-size: 13px;
   cursor: pointer;
-  min-width: 200px;
+  min-width: 220px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
 }
 
 select:hover {
   border-color: #007acc;
+  background: #454545;
 }
 
 select:focus {
   outline: none;
   border-color: #007acc;
-  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+  box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.25);
+  background: #454545;
 }
 
 option {
   background: #3c3c3c;
-  color: #cccccc;
+  color: #ffffff;
+  padding: 8px;
 }
 </style>

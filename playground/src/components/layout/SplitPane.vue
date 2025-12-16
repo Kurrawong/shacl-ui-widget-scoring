@@ -84,20 +84,46 @@ onUnmounted(() => {
 }
 
 .divider {
-  width: 4px;
+  width: 6px;
   background: #3e3e42;
   cursor: col-resize;
-  transition: background-color 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
+  position: relative;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 40px;
+  background: #252526;
+  border-radius: 1px;
+  opacity: 0.5;
+  transition: opacity 0.2s;
 }
 
 .divider:hover {
   background: #007acc;
+  box-shadow: 0 0 8px rgba(0, 122, 204, 0.4);
+}
+
+.divider:hover::before {
+  opacity: 1;
+  background: #ffffff;
 }
 
 .divider.horizontal {
   width: auto;
-  height: 4px;
+  height: 6px;
   cursor: row-resize;
+}
+
+.divider.horizontal::before {
+  width: 40px;
+  height: 2px;
 }
 </style>

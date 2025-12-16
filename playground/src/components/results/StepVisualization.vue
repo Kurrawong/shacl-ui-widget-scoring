@@ -102,33 +102,38 @@ function getWidgetName(widget: string): string {
   flex: 0 0 300px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   max-height: 600px;
   overflow-y: auto;
   background: #252526;
-  padding: 12px;
-  border-radius: 4px;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #3e3e42;
 }
 
 .step-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
+  padding: 14px;
   background: #2d2d30;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border-left: 3px solid transparent;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .step-item:hover {
   background: #3e3e42;
+  transform: translateX(2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .step-item.active {
-  background: #007acc;
+  background: linear-gradient(135deg, #007acc 0%, #005a9e 100%);
   border-left-color: #4ec9b0;
+  box-shadow: 0 2px 8px rgba(0, 122, 204, 0.4);
 }
 
 .step-number {
@@ -174,10 +179,12 @@ function getWidgetName(widget: string): string {
 .step-details {
   flex: 1;
   background: #252526;
-  padding: 16px;
-  border-radius: 4px;
+  padding: 20px;
+  border-radius: 8px;
   overflow-y: auto;
   max-height: 600px;
+  border: 1px solid #3e3e42;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .step-details h4 {

@@ -4,10 +4,12 @@ import { usePlaygroundStore } from '@/stores/playground'
 import { useScoringStore } from '@/stores/scoring'
 import { useExamples } from '@/composables/useExamples'
 import { usePyodide } from '@/composables/usePyodide'
+import Header from '@/components/layout/Header.vue'
 import Toolbar from '@/components/layout/Toolbar.vue'
 import SplitPane from '@/components/layout/SplitPane.vue'
 import EditorPanel from '@/components/editors/EditorPanel.vue'
 import ResultsPanel from '@/components/results/ResultsPanel.vue'
+import Footer from '@/components/layout/Footer.vue'
 
 const playgroundStore = usePlaygroundStore()
 const scoringStore = useScoringStore()
@@ -91,6 +93,8 @@ watch(currentExampleId, (newId) => {
 
 <template>
   <div class="app">
+    <Header />
+
     <Toolbar
       :current-example="currentExampleId"
       :examples="examples.map((ex) => ({ id: ex.id, name: ex.name }))"
@@ -131,6 +135,8 @@ watch(currentExampleId, (newId) => {
         </template>
       </SplitPane>
     </div>
+
+    <Footer />
   </div>
 </template>
 
