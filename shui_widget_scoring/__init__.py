@@ -1,7 +1,7 @@
 """SHACL UI Widget Scoring Library
 
 This library implements the SHACL UI Widget Scoring algorithm as specified
-in the SHACL UI Community Group specification.
+in the SHACL UI specification.
 """
 
 __version__ = "0.1.0"

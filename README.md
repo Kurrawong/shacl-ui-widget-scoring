@@ -253,7 +253,7 @@ spec.md                 # Full specification
 ## References
 
 - [SHACL Specification](https://www.w3.org/TR/shacl/)
-- [SHACL UI Community Group](https://www.w3.org/community/shacl-ui/)
+- [SHACL 1.2 User Interfaces](https://w3c.github.io/data-shapes/shacl12-ui/)
 - [RDFlib Documentation](https://rdflib.readthedocs.io/)
 - [pyshacl Documentation](https://pyshacl.readthedocs.io/)
 

@@ -6,7 +6,7 @@ This document defines the SHACL UI Widget Scoring ontology and algorithm. It pro
 
 ## Status of This Document
 
-This document is a draft specification for the SHACL UI Community Group.
+This document is a draft specification for the SHACL UI Task Force.
 
 ## 1. Introduction
 
