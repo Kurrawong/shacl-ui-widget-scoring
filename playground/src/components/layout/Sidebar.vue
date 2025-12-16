@@ -65,7 +65,7 @@
         </div>
 
         <div v-else class="saves-list">
-          <button
+          <div
             v-for="save in saves"
             :key="save.id"
             :class="['save-card', { 'save-card-active': save.id === activeSaveId }]"
@@ -80,16 +80,9 @@
               @click.stop="$emit('delete', save.id)"
               aria-label="Delete save"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                />
-              </svg>
+              <Trash2 :size="16" />
             </button>
-          </button>
+          </div>
         </div>
       </div>
     </aside>
@@ -99,6 +92,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import type { SavedConfiguration } from '@/types/saves'
+import { Trash2 } from 'lucide-vue-next'
 
 interface Props {
   saves: SavedConfiguration[]
@@ -274,6 +268,7 @@ const formatDate = (timestamp: number): string => {
   text-align: left;
   width: 100%;
   gap: 8px;
+  user-select: none;
 }
 
 .save-card:hover {
@@ -320,7 +315,7 @@ const formatDate = (timestamp: number): string => {
 .delete-button {
   background: none;
   border: none;
-  color: #858585;
+  color: #cccccc;
   cursor: pointer;
   padding: 6px;
   border-radius: 4px;
@@ -329,11 +324,6 @@ const formatDate = (timestamp: number): string => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  opacity: 0;
-}
-
-.save-card:hover .delete-button {
-  opacity: 1;
 }
 
 .delete-button:hover {

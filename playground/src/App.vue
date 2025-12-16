@@ -10,11 +10,12 @@ import Header from '@/components/layout/Header.vue'
 import Toolbar from '@/components/layout/Toolbar.vue'
 import Sidebar from '@/components/layout/Sidebar.vue'
 import SaveModal from '@/components/layout/SaveModal.vue'
-import ToastContainer from '@/components/layout/ToastContainer.vue'
+import { Toaster } from '@/components/ui/sonner'
 import SplitPane from '@/components/layout/SplitPane.vue'
 import EditorPanel from '@/components/editors/EditorPanel.vue'
 import ResultsPanel from '@/components/results/ResultsPanel.vue'
 import Footer from '@/components/layout/Footer.vue'
+import 'vue-sonner/style.css'
 
 const playgroundStore = usePlaygroundStore()
 const scoringStore = useScoringStore()
@@ -233,7 +234,7 @@ function handleDeleteSave(saveId: string) {
       @save="handleSave"
     />
 
-    <ToastContainer />
+    <Toaster />
   </div>
 </template>
 
